@@ -29,10 +29,13 @@ def parse_arguments():
 		if len(sys.argv) == 1:
 			raise HelpMessage
 		if len(sys.argv) == 2:
-			if (sys.argv[1] == "-h" or sys.argv[1] == "--help"):
+			if sys.argv[1] == "-h" or sys.argv[1] == "--help":
 				raise FullHelpMessage
 			else:
 				raise NotEnoughArguments
+		if len(sys.argv) == 3:
+			if sys.argv[1] == "-d":
+				delete_job(sys.argv[2])
 		if len(sys.argv) >= 4:
 			return sys.argv[1], " ".join(sys.argv[2:])
 		else:
@@ -47,11 +50,12 @@ def parse_arguments():
 		print(("{}SuperCron{} is utility that allows you to enter intelligent schedule commands that" +
 			" will be translated into crontab entries.").format(Color.BOLD, Color.END))
 		print("")
-		print("{}Usage:{} supercron <job name> <command> <time or repetition>"
+		print("{}Usage:{}\n\tTo add a job:\t\tsupercron <job name> <command> <time or repetition>"
 			.format(Color.BOLD, Color.END))
+		print("\tTo delete a job:\tsupercron -d <job name>")
 		sys.exit(0)
 	except NotEnoughArguments:
-		print("Error: not enough arguments. Type 'supercon --help' for help.")
+		print("Error: not enough (or invalid) arguments. Type 'supercon --help' for help.")
 		sys.exit(1)
 
 def add_job(name, command, repeat):
@@ -80,6 +84,11 @@ def add_job(name, command, repeat):
 		job.month.during(repeat['month_on'])
 	job.enable()
 	cron.write_to_user(user=True)
+
+def delete_job(name):
+	"""delete the specified job from user's crontab"""
+	cron = CronTab(user=True)
+	cron.remove_all(comment=name)
 
 
 if __name__ == "__main__":
