@@ -33,31 +33,31 @@ def parse_arguments():
 				raise FullHelpMessage
 			else:
 				raise NotEnoughArguments
-		else:
+		if len(sys.argv) >= 4:
 			return sys.argv[1], " ".join(sys.argv[2:])
+		else:
+			raise NotEnoughArguments
 	except HelpMessage:
-		print("{}Usage:{} supercron <command to be excecuted> <time or repetition clause>"
+		print("{}Usage:{} supercron <job name> <command> <time or repetition>"
 			.format(Color.BOLD, Color.END))
 		print("")
 		print("Type 'supercron -h' or 'supercron --help' for detailed information and examples.")
-		print("")
 		sys.exit(0)
 	except FullHelpMessage:
 		print(("{}SuperCron{} is utility that allows you to enter intelligent schedule commands that" +
 			" will be translated into crontab entries.").format(Color.BOLD, Color.END))
 		print("")
-		print("{}Usage:{} supercron <command to be excecuted> <time or repetition clause>"
+		print("{}Usage:{} supercron <job name> <command> <time or repetition>"
 			.format(Color.BOLD, Color.END))
-		print("")
 		sys.exit(0)
 	except NotEnoughArguments:
 		print("Error: not enough arguments. Type 'supercon --help' for help.")
 		sys.exit(1)
 
-def add_job(command, repeat):
+def add_job(name, command, repeat):
 	"""add the job to crontab"""
 	cron = CronTab(user=True)
-	job = cron.new(command=command)
+	job = cron.new(command=command, comment=name)
 	if "min_every" in repeat:
 		job.minute.every(repeat['min_every'])
 	if "min_on" in repeat:
