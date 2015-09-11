@@ -24,6 +24,7 @@ class Color:
 
 
 def parse_arguments():
+	"""parse the arguments coming from running the script"""
 	try:
 		if len(sys.argv) == 1:
 			raise HelpMessage
@@ -35,7 +36,7 @@ def parse_arguments():
 		else:
 			return sys.argv[1], " ".join(sys.argv[2:])
 	except HelpMessage:
-		print("{}Usage:{} supercron <script to be excecuted> <time or repetition clause>"
+		print("{}Usage:{} supercron <command to be excecuted> <time or repetition clause>"
 			.format(Color.BOLD, Color.END))
 		print("")
 		print("Type 'supercron -h' or 'supercron --help' for detailed information and examples.")
@@ -45,7 +46,7 @@ def parse_arguments():
 		print(("{}SuperCron{} is utility that allows you to enter intelligent schedule commands that" +
 			" will be translated into crontab entries.").format(Color.BOLD, Color.END))
 		print("")
-		print("{}Usage:{} supercron <script to be excecuted> <time or repetition clause>"
+		print("{}Usage:{} supercron <command to be excecuted> <time or repetition clause>"
 			.format(Color.BOLD, Color.END))
 		print("")
 		sys.exit(0)
@@ -53,8 +54,12 @@ def parse_arguments():
 		print("Error: not enough arguments. Type 'supercon --help' for help.")
 		sys.exit(1)
 
+def add_job(command, repeat):
+	"""add the job to crontab"""
+	cron = CronTab(user=True)
+	job = cron.new(command=command)
 
 
 if __name__ == "__main__":
-	script, repeat = parse_arguments()
+	command, repeat = parse_arguments()
 	sys.exit(0)
