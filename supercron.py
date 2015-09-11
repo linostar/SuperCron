@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import re
 
 from crontab import CronTab
 
@@ -90,11 +91,16 @@ def delete_job(name):
 	cron = CronTab(user=True)
 	cron.remove_all(comment=name)
 
-def parse_repetition(repeat):
+def parse_repetition(repetition):
+	repeat = {}
+	repetition = repetition.lower()
+	matched = re.search(r"^once every (\d+) minute(s)?(\.)?$", repetition)
+	if matched:
+		repeat['min_every'] = int(matched.group(1))
 	return repeat
 
 
 if __name__ == "__main__":
-	name, command, repeat = parse_arguments()
-	add_job(name, command, parse_repetition(repeat))
+	name, command, repetition = parse_arguments()
+	add_job(name, command, parse_repetition(repetition))
 	sys.exit(0)
