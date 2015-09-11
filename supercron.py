@@ -58,6 +58,28 @@ def add_job(command, repeat):
 	"""add the job to crontab"""
 	cron = CronTab(user=True)
 	job = cron.new(command=command)
+	if "min_every" in repeat:
+		job.minute.every(repeat['min_every'])
+	if "min_on" in repeat:
+		job.minute.during(repeat['min_on'])
+	if "hour_every" in repeat:
+		job.hour.every(repeat['hour_every'])
+	if "hour_on" in repeat:
+		job.hour.on(repeat['hour_on'])
+	if "day_every" in repeat:
+		job.day.every(repeat['day_every'])
+	if "day_on" in repeat:
+		job.day.on(repeat['day_on'])
+	if "dow_every" in repeat:
+		job.dow.every(repeat['dow_every'])
+	if "dow_on" in repeat:
+		job.dow.on(repeat['dow_on'])
+	if "month_every" in repeat:
+		job.month.every(repeat['month_every'])
+	if "month_on" in repeat:
+		job.month.during(repeat['month_on'])
+	job.enable()
+	cron.write_to_user(user=True)
 
 
 if __name__ == "__main__":
