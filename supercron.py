@@ -90,7 +90,11 @@ def delete_job(name):
 	cron = CronTab(user=True)
 	cron.remove_all(comment=name)
 
+def parse_repetition(repeat):
+	return repeat
+
 
 if __name__ == "__main__":
-	command, repeat = parse_arguments()
+	name, command, repeat = parse_arguments()
+	add_job(name, command, parse_repetition(repeat))
 	sys.exit(0)
