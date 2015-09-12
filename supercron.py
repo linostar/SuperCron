@@ -86,13 +86,28 @@ def parse_repetition(repetition):
 	repetition = repetition.lower()
 	matched = re.search(r"^(once )?every (\d+) minute(s)?(\.)?$", repetition)
 	if matched:
-		repeat['min_every'] = int(matched.group(2))
+		if int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
+			repeat['min_every'] = int(matched.group(2))
+		else:
+			print("Error: invalid value '{}'. Expected 1-59 for minutes.")
+			sys.exit(1)
 	matched = re.search(r"^(once )?every (\d+) hour(s)?(\.)?$", repetition)
 	if matched:
-		repeat['hour_every'] = int(matched.group(2))
+		if int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
+			repeat['hour_every'] = int(matched.group(2))
+			repeat['min_on'] = 0
+		else:
+			print("Error: invalid value '{}'. Expected 1-23 for hours.")
+			sys.exit(1)
 	matched = re.search(r"^(once )?every (\d+) day(s)?(\.)?$", repetition)
 	if matched:
-		repeat['day_every'] = int(matched.group(2))
+		if int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
+			repeat['day_every'] = int(matched.group(2))
+			repeat['min_on'] = 0
+			repeat['hour_on'] = 0
+		else:
+			print("Error: invalid value '{}'. Expected 1-31 for days of month.")
+			sys.exit(1)
 	return repeat
 
 
