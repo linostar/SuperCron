@@ -32,12 +32,14 @@ class Color:
 def parse_arguments():
 	"""parse the arguments coming from running the script"""
 	try:
-		parser = argparse.ArgumentParser(description='A utility that translates intelligent schedule commands to crontab entries')
-		parser.add_argument('-r', '--repetition', nargs='+', help='repetition clause')
+		parser = argparse.ArgumentParser(
+			description='A utility that translates intelligent schedule commands to crontab entries')
+		parser.add_argument('-r', '--repetition', nargs=1, help='repetition clause')
 		parser.add_argument('-c', '--command', nargs=1,
 			help='command to be executed by the job (should be enclosed by quotes if it contains spaces)')
-		parser.add_argument('-d', '--delete', action='store_true', help='name of the job')
-		parser.add_argument('name', nargs='+', help='name of the job')
+		parser.add_argument('-d', '--delete', action='store_true',
+			help='for deleteing a job (cannot be simultaneously used with other options)')
+		parser.add_argument('name', help='name of the job')
 		args = parser.parse_args()
 		if args.delete and (args.repetition or args.command):
 			raise CantUseDeleteWithOthers
@@ -45,7 +47,7 @@ def parse_arguments():
 			delete_job(args.name)
 			sys.exit(0)
 		if args.repetition and args.command:
-			return args.command, args.repetition
+			return args.name, args.command, args.repetition
 		else:
 			raise NotEnoughArguments
 	except CantUseDeleteWithOthers:
@@ -100,7 +102,7 @@ def delete_job(name):
 	"""delete the specified job from user's crontab"""
 	cron = CronTab(user=True)
 	cron.remove_all(comment=name)
-	print("Job '{}' has been deleted.")
+	print("Job '{}' has been deleted.".format(name))
 
 def parse_repetition(repetition):
 	repeat = {}
@@ -113,5 +115,5 @@ def parse_repetition(repetition):
 
 if __name__ == "__main__":
 	name, command, repetition = parse_arguments()
-	add_job(name, command, parse_repetition(repetition))
+	add_job(name, command[0], parse_repetition(repetition[0]))
 	sys.exit(0)
