@@ -7,14 +7,6 @@ import argparse
 from crontab import CronTab
 
 
-class HelpMessage(Exception):
-	pass
-
-
-class FullHelpMessage(Exception):
-	pass
-
-
 class NotEnoughArguments(Exception):
 	pass
 
@@ -23,23 +15,20 @@ class CantUseDeleteWithOthers(Exception):
 	pass
 
 
-class Color:
-	BOLD = '\033[1m'
-	UNDERLINE = '\033[4m'
-	END = '\033[0m'
-
-
 def parse_arguments():
 	"""parse the arguments coming from running the script"""
 	try:
-		parser = argparse.ArgumentParser(
-			description='A utility that translates intelligent schedule commands to crontab entries')
-		parser.add_argument('-r', '--repetition', nargs=1, help='repetition clause')
-		parser.add_argument('-c', '--command', nargs=1,
-			help='command to be executed by the job (should be enclosed by quotes if it contains spaces)')
-		parser.add_argument('-d', '--delete', action='store_true',
-			help='for deleteing a job (cannot be simultaneously used with other options)')
-		parser.add_argument('name', help='name of the job')
+		parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+			description="A utility that translates intelligent schedule commands to crontab entries.",
+			epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j >> some_file\" -r \"every 1 hour\" log_dates" +
+			"\n\tDelete a job:\tsupercron -d log_dates")
+		parser.add_argument("-r", "--repetition", nargs=1,
+			help="repetition clause (should be enclosed by quotes if it contains spaces)")
+		parser.add_argument("-c", "--command", nargs=1,
+			help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
+		parser.add_argument("-d", "--delete", action="store_true",
+			help="for deleteing a job (cannot be simultaneously used with other options)")
+		parser.add_argument("name", help="name of the job")
 		args = parser.parse_args()
 		if args.delete and (args.repetition or args.command):
 			raise CantUseDeleteWithOthers
@@ -53,20 +42,6 @@ def parse_arguments():
 	except CantUseDeleteWithOthers:
 		print("Option '--delete' cannot be used with any other options.")
 		sys.exit(1)
-	except HelpMessage:
-		print("{}Usage:{} supercron <job name> <command> <time or repetition>"
-			.format(Color.BOLD, Color.END))
-		print("")
-		print("Type 'supercron -h' or 'supercron --help' for detailed information and examples.")
-		sys.exit(0)
-	except FullHelpMessage:
-		print(("{}SuperCron{} is utility that allows you to enter intelligent schedule commands that" +
-			" will be translated into crontab entries.").format(Color.BOLD, Color.END))
-		print("")
-		print("{}Usage:{}\n\tTo add a job:\t\tsupercron <job name> <command> <time or repetition>"
-			.format(Color.BOLD, Color.END))
-		print("\tTo delete a job:\tsupercron -d <job name>")
-		sys.exit(0)
 	except NotEnoughArguments:
 		print("Error: not enough (or invalid) arguments. Type 'supercon --help' for help.")
 		sys.exit(1)
