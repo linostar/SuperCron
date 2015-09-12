@@ -43,7 +43,7 @@ def parse_arguments():
 		print("Option '--delete' cannot be used with any other options.")
 		sys.exit(1)
 	except NotEnoughArguments:
-		print("Error: not enough (or invalid) arguments. Type 'supercon --help' for help.")
+		print("Error: not enough (or invalid) arguments. Type 'supercron --help' for help.")
 		sys.exit(1)
 
 def add_job(name, command, repeat):
@@ -72,19 +72,27 @@ def add_job(name, command, repeat):
 		job.month.during(repeat['month_on'])
 	job.enable()
 	cron.write_to_user(user=True)
+	print("Job '{}' has been successfully added.".format(name))
 
 def delete_job(name):
 	"""delete the specified job from user's crontab"""
 	cron = CronTab(user=True)
 	cron.remove_all(comment=name)
+	cron.write_to_user(user=True)
 	print("Job '{}' has been deleted.".format(name))
 
 def parse_repetition(repetition):
 	repeat = {}
 	repetition = repetition.lower()
-	matched = re.search(r"^once every (\d+) minute(s)?(\.)?$", repetition)
+	matched = re.search(r"^(once )?every (\d+) minute(s)?(\.)?$", repetition)
 	if matched:
-		repeat['min_every'] = int(matched.group(1))
+		repeat['min_every'] = int(matched.group(2))
+	matched = re.search(r"^(once )?every (\d+) hour(s)?(\.)?$", repetition)
+	if matched:
+		repeat['hour_every'] = int(matched.group(2))
+	matched = re.search(r"^(once )?every (\d+) day(s)?(\.)?$", repetition)
+	if matched:
+		repeat['day_every'] = int(matched.group(2))
 	return repeat
 
 
