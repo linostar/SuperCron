@@ -2,6 +2,7 @@
 
 import sys
 import re
+import argparse
 
 from crontab import CronTab
 
@@ -27,6 +28,12 @@ class Color:
 def parse_arguments():
 	"""parse the arguments coming from running the script"""
 	try:
+		parser = argparse.ArgumentParser(description='A utility that translates intelligent schedule commands to crontab entries')
+		parser.add_argument('-r', '--repetition', nargs='+', help='repetition clause')
+		parser.add_argument('-c', '--command', nargs=1,
+			help='command to be executed by the job (should be enclosed by quotes if it contains spaces)')
+		parser.add_argument('-d', '--delete', action='store_true', help='name of the job')
+		parser.add_argument('name', nargs='+', help='name of the job')
 		if len(sys.argv) == 1:
 			raise HelpMessage
 		if len(sys.argv) == 2:
