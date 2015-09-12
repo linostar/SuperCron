@@ -19,6 +19,10 @@ class NotEnoughArguments(Exception):
 	pass
 
 
+class CantUseDeleteWithOthers(Exception):
+	pass
+
+
 class Color:
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
@@ -34,20 +38,19 @@ def parse_arguments():
 			help='command to be executed by the job (should be enclosed by quotes if it contains spaces)')
 		parser.add_argument('-d', '--delete', action='store_true', help='name of the job')
 		parser.add_argument('name', nargs='+', help='name of the job')
-		if len(sys.argv) == 1:
-			raise HelpMessage
-		if len(sys.argv) == 2:
-			if sys.argv[1] == "-h" or sys.argv[1] == "--help":
-				raise FullHelpMessage
-			else:
-				raise NotEnoughArguments
-		if len(sys.argv) == 3:
-			if sys.argv[1] == "-d":
-				delete_job(sys.argv[2])
-		if len(sys.argv) >= 4:
-			return sys.argv[1], " ".join(sys.argv[2:])
+		args = parser.parse_args()
+		if args.delete and (args.repetition or args.command):
+			raise CantUseDeleteWithOthers
+		if args.delete:
+			delete_job(args.name)
+			sys.exit(0)
+		if args.repetition and args.command:
+			return args.command, args.repetition
 		else:
 			raise NotEnoughArguments
+	except CantUseDeleteWithOthers:
+		print("Option '--delete' cannot be used with any other options.")
+		sys.exit(1)
 	except HelpMessage:
 		print("{}Usage:{} supercron <job name> <command> <time or repetition>"
 			.format(Color.BOLD, Color.END))
@@ -97,6 +100,7 @@ def delete_job(name):
 	"""delete the specified job from user's crontab"""
 	cron = CronTab(user=True)
 	cron.remove_all(comment=name)
+	print("Job '{}' has been deleted.")
 
 def parse_repetition(repetition):
 	repeat = {}
