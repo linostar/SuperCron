@@ -48,12 +48,15 @@ def parse_arguments():
 
 def add_job(name, command, repeat):
 	"""add the job to crontab"""
+	if not repeat:
+		print("Error: invalid repetition clause.")
+		sys.exit(1)
 	cron = CronTab(user=True)
 	job = cron.new(command=command, comment=name)
 	if "min_every" in repeat:
 		job.minute.every(repeat['min_every'])
 	if "min_on" in repeat:
-		job.minute.during(repeat['min_on'])
+		job.minute.on(repeat['min_on'])
 	if "hour_every" in repeat:
 		job.hour.every(repeat['hour_every'])
 	if "hour_on" in repeat:
@@ -69,7 +72,7 @@ def add_job(name, command, repeat):
 	if "month_every" in repeat:
 		job.month.every(repeat['month_every'])
 	if "month_on" in repeat:
-		job.month.during(repeat['month_on'])
+		job.month.on(repeat['month_on'])
 	job.enable()
 	cron.write_to_user(user=True)
 	print("Job '{}' has been successfully added.".format(name))
@@ -84,14 +87,14 @@ def delete_job(name):
 def parse_repetition(repetition):
 	repeat = {}
 	repetition = repetition.lower()
-	matched = re.search(r"^(once )?every (\d+) minute(s)?(\.)?$", repetition)
+	matched = re.search(r"(once )?every (\d+) minute(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
 			repeat['min_every'] = int(matched.group(2))
 		else:
 			print("Error: invalid value '{}'. Expected 1-59 for minutes.")
 			sys.exit(1)
-	matched = re.search(r"^(once )?every (\d+) hour(s)?(\.)?$", repetition)
+	matched = re.search(r"(once )?every (\d+) hour(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
 			repeat['hour_every'] = int(matched.group(2))
@@ -99,14 +102,14 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value '{}'. Expected 1-23 for hours.")
 			sys.exit(1)
-	matched = re.search(r"^(once )?every (\d+) day(s)?(\.)?$", repetition)
+	matched = re.search(r"(once )?every (\d+) day(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
 			repeat['day_every'] = int(matched.group(2))
 			repeat['min_on'] = 0
 			repeat['hour_on'] = 0
 		else:
-			print("Error: invalid value '{}'. Expected 1-31 for days of month.")
+			print("Error: invalid value '{}'. Expected 1-31 for days.")
 			sys.exit(1)
 	return repeat
 
