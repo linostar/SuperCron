@@ -87,14 +87,14 @@ def delete_job(name):
 def parse_repetition(repetition):
 	repeat = {}
 	repetition = repetition.lower()
-	matched = re.search(r"(once )?every (\d+) minute(s)?(\.)?", repetition)
+	matched = re.search(r"(once\s+)?every\s+(\d+)\s+minute(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
 			repeat['min_every'] = int(matched.group(2))
 		else:
 			print("Error: invalid value '{}'. Expected 1-59 for minutes.")
 			sys.exit(1)
-	matched = re.search(r"(once )?every (\d+) hour(s)?(\.)?", repetition)
+	matched = re.search(r"(once\s+)?every\s+(\d+)\s+hour(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
 			repeat['hour_every'] = int(matched.group(2))
@@ -102,7 +102,7 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value '{}'. Expected 1-23 for hours.")
 			sys.exit(1)
-	matched = re.search(r"(once )?every (\d+) day(s)?(\.)?", repetition)
+	matched = re.search(r"(once\s+)?every\s+(\d+)\s+day(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
 			repeat['day_every'] = int(matched.group(2))
@@ -110,6 +110,23 @@ def parse_repetition(repetition):
 			repeat['hour_on'] = 0
 		else:
 			print("Error: invalid value '{}'. Expected 1-31 for days.")
+			sys.exit(1)
+	matched = re.search(r"(on\s+)?(\d+):(\d+)(\s+(am|pm))?", repetition)
+	if matched:
+		hour = int(matched.group(2))
+		minute = int(matched.group(3))
+		if matched.group(4):
+			if matched.group(5) == "pm":
+				if hour != 12:
+					hour += 12
+			else:
+				if hour == 12:
+					hour = 0
+		if hour < 24 and minute < 59:
+			repeat['min_on'] = minute
+			repeat['hour_on'] = hour
+		else:
+			print("Error: invalid value for hour and/or minute.")
 			sys.exit(1)
 	return repeat
 
