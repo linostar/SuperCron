@@ -78,7 +78,9 @@ def add_job(name, command, repeat):
 	if "dow_every" in repeat:
 		job.dow.every(repeat['dow_every'])
 	if "dow_on" in repeat:
-		job.dow.on(repeat['dow_on'])
+		job.dow.on(*repeat['dow_on'])
+	if "dow_during" in repeat:
+		job.dow.during(*repeat['dow_during'])
 	if "month_every" in repeat:
 		job.month.every(repeat['month_every'])
 	if "month_on" in repeat:
@@ -145,7 +147,7 @@ def parse_repetition(repetition):
 	if weekdays:
 		repeat['min_on'] = 0
 		repeat['hour_on'] = 0
-		repeat['dow_on'] = ",".join(weekdays)
+		repeat['dow_on'] = weekdays
 	return repeat
 
 
