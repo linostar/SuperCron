@@ -15,6 +15,16 @@ class CantUseDeleteWithOthers(Exception):
 	pass
 
 
+DAYS = {
+	"sunday": "0",
+	"monday": "1",
+	"tuesday": "2",
+	"wednesday": "3",
+	"thursday": "4",
+	"friday": "5",
+	"saturday": "6"
+}
+
 def parse_arguments():
 	"""parse the arguments coming from running the script"""
 	try:
@@ -128,6 +138,14 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value for hour and/or minute.")
 			sys.exit(1)
+	matched = re.finditer(r"(on\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", repetition)
+	weekdays = []
+	for match in matched:
+		weekdays.append(DAYS[match.group(2)])
+	if weekdays:
+		repeat['min_on'] = 0
+		repeat['hour_on'] = 0
+		repeat['dow_on'] = ",".join(weekdays)
 	return repeat
 
 
