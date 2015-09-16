@@ -140,7 +140,7 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value for hour and/or minute.")
 			sys.exit(1)
-	matched = re.finditer(r"(on\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", repetition)
+	matched = re.finditer(r"(on\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", repetition)
 	weekdays = []
 	for match in matched:
 		weekdays.append(DAYS[match.group(2)])
@@ -148,6 +148,24 @@ def parse_repetition(repetition):
 		repeat['min_on'] = 0
 		repeat['hour_on'] = 0
 		repeat['dow_on'] = weekdays
+	matched = re.search(r"(from\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+to\s+" +
+		r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)", repetition)
+	if matched:
+		weekdays = []
+		weekdays.append(DAYS[matched.group(2)])
+		weekdays.append(DAYS[matched.group(3)])
+		repeat['min_on'] = 0
+		repeat['hour_on'] = 0
+		if weekdays[0] < weekdays[1]:
+			repeat['dow_during'] = weekdays
+		else:
+			dows = []
+			i = int(weekdays[0])
+			while i != int(weekdays[1]):
+				dows.append(str(i))
+				i = (i + 1) % 7
+			dows.append(str(weekdays[1]))
+			repeat['dow_on'] = dows
 	return repeat
 
 
