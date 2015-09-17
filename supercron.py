@@ -12,7 +12,7 @@ class NotEnoughArguments(Exception):
 	pass
 
 
-class CantUseDeleteWithOthers(Exception):
+class CantUseOptWithOthers(Exception):
 	pass
 
 
@@ -42,23 +42,27 @@ def parse_arguments():
 		parser.add_argument("--disable", action="store_true", help="for disabling a job")
 		parser.add_argument("name", help="name of the job")
 		args = parser.parse_args()
-		if args.delete and (args.repetition or args.command):
-			raise CantUseDeleteWithOthers
 		if args.delete:
+			if not check_other_args("delete", args):
+				raise CantUseOptWithOthers
 			delete_job(args.name)
 			sys.exit(0)
 		if args.enable:
+			if not check_other_args("enable", args):
+				raise CantUseOptWithOthers
 			enable_job(args.name, True)
 			sys.exit(0)
 		if args.disable:
+			if not check_other_args("disable", args):
+				raise CantUseOptWithOthers
 			enable_job(args.name, False)
 			sys.exit(0)
 		if args.repetition and args.command:
 			return args.name, args.command, args.repetition
 		else:
 			raise NotEnoughArguments
-	except CantUseDeleteWithOthers:
-		print("Option '--delete' cannot be used with any other options.")
+	except CantUseOptWithOthers:
+		print("Options '--delete', '--disable' and '--enable' cannot be used with any other options.")
 		sys.exit(1)
 	except NotEnoughArguments:
 		print("Error: not enough (or invalid) arguments. Type 'supercron --help' for help.")
@@ -66,7 +70,7 @@ def parse_arguments():
 
 def check_other_args(wanted, args):
 	for arg in args.__dict__:
-		if arg != wanted and arg:
+		if arg != wanted and arg != "name" and args.__dict__[arg]:
 			return False
 	return True
 
