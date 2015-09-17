@@ -37,14 +37,21 @@ def parse_arguments():
 			help="repetition clause (should be enclosed by quotes if it contains spaces)")
 		parser.add_argument("-c", "--command", nargs=1,
 			help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
-		parser.add_argument("-d", "--delete", action="store_true",
-			help="for deleteing a job (cannot be simultaneously used with other options)")
+		parser.add_argument("-d", "--delete", action="store_true", help="for deleteing a job")
+		parse.add_argument("--enable", action="store_true", help="for enabling a job")
+		parse.add_argument("--disable", action="store_true", help="for disabling a job")
 		parser.add_argument("name", help="name of the job")
 		args = parser.parse_args()
 		if args.delete and (args.repetition or args.command):
 			raise CantUseDeleteWithOthers
 		if args.delete:
 			delete_job(args.name)
+			sys.exit(0)
+		if args.enable:
+			enable_job(args.name)
+			sys.exit(0)
+		if args.disable:
+			disable_job(args.name)
 			sys.exit(0)
 		if args.repetition and args.command:
 			return args.name, args.command, args.repetition
