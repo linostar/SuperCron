@@ -48,10 +48,10 @@ def parse_arguments():
 			delete_job(args.name)
 			sys.exit(0)
 		if args.enable:
-			enable_job(args.name)
+			enable_job(args.name, True)
 			sys.exit(0)
 		if args.disable:
-			disable_job(args.name)
+			enable_job(args.name, False)
 			sys.exit(0)
 		if args.repetition and args.command:
 			return args.name, args.command, args.repetition
@@ -68,6 +68,16 @@ def get_time_now():
 	hour = datetime.now().hour
 	minute = datetime.now().minute
 	return [hour, minute]
+
+def enable_job(name, enable_it):
+	cron = CronTab(user=True)
+	for job in cron.find_comment(name):
+		job.enable(enable_it)
+	if enable_it:
+		action = "enabled"
+	else:
+		action = "disabled"
+	print("Jobs named '{}' have been {}.".format(name, action))
 
 def add_job(name, command, repeat):
 	"""add the job to crontab"""
