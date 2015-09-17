@@ -87,6 +87,7 @@ def enable_job(name, enable_it):
 		action = "enabled"
 	else:
 		action = "disabled"
+	cron.write_to_user(user=True)
 	print("Jobs named '{}' have been {}.".format(name, action))
 
 def add_job(name, command, repeat):
