@@ -38,8 +38,8 @@ def parse_arguments():
 		parser.add_argument("-c", "--command", nargs=1,
 			help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
 		parser.add_argument("-d", "--delete", action="store_true", help="for deleteing a job")
-		parse.add_argument("--enable", action="store_true", help="for enabling a job")
-		parse.add_argument("--disable", action="store_true", help="for disabling a job")
+		parser.add_argument("--enable", action="store_true", help="for enabling a job")
+		parser.add_argument("--disable", action="store_true", help="for disabling a job")
 		parser.add_argument("name", help="name of the job")
 		args = parser.parse_args()
 		if args.delete and (args.repetition or args.command):
@@ -63,6 +63,12 @@ def parse_arguments():
 	except NotEnoughArguments:
 		print("Error: not enough (or invalid) arguments. Type 'supercron --help' for help.")
 		sys.exit(1)
+
+def check_other_args(wanted, args):
+	for arg in args.__dict__:
+		if arg != wanted and arg:
+			return False
+	return True
 
 def get_time_now():
 	hour = datetime.now().hour
