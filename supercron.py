@@ -26,6 +26,16 @@ DAYS = {
 	"saturday": "6"
 }
 
+SHORT_DAYS = {
+	"sun": "sunday",
+	"mon": "monday",
+	"tue": "tuesday",
+	"wed": "wednesday",
+	"thu": "thursday",
+	"fri": "friday",
+	"sat": "saturday"
+}
+
 def parse_arguments():
 	"""parse the arguments coming from running the script"""
 	try:
