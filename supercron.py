@@ -26,15 +26,24 @@ DAYS = {
 	"saturday": "6"
 }
 
-SHORT_DAYS = {
-	"sun": "sunday",
-	"mon": "monday",
-	"tue": "tuesday",
-	"wed": "wednesday",
-	"thu": "thursday",
-	"fri": "friday",
-	"sat": "saturday"
+MONTHS = {
+	"january": "1",
+	"february": "2",
+	"march": "3",
+	"april": "4",
+	"may": "5",
+	"june": "6",
+	"july": "7",
+	"august": "8",
+	"september": "9",
+	"october": "10",
+	"november": "11",
+	"december": "12"
 }
+
+SHORT_DAYS = {key[:3]:key for key in DAYS.keys()}
+
+SHORT_MONTHS = {key[:3]:key for key in MONTHS.keys()}
 
 def parse_arguments():
 	"""parse the arguments coming from running the script"""
