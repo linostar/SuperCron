@@ -96,7 +96,7 @@ def check_other_args(wanted, args):
 def get_time_now():
 	hour = datetime.now().hour
 	minute = datetime.now().minute
-	return [hour, minute]
+	return hour, minute
 
 def enable_job(name, enable_it):
 	cron = CronTab(user=True)
@@ -202,7 +202,6 @@ def parse_repetition(repetition):
 	for match in matched:
 		weekdays.append(DAYS[match.group(2)])
 	if weekdays:
-		
 		repeat['dow_on'] = weekdays
 	matched = re.search(r"(from\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+to\s+" +
 		r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)", repetition)
@@ -220,7 +219,12 @@ def parse_repetition(repetition):
 				i = (i + 1) % 7
 			dows.append(str(weekdays[1]))
 			repeat['dow_on'] = dows
-	
+	# check if minute and hour fields are empty
+	hour, minute = get_time_now()
+	if not ("min_on" in repeat or "min_every" in repeat):
+		repeat['min_on'] = minute
+	if not ("hour_on" in repeat or "hour_every" in repeat):
+		repeat['hour_on'] = hour
 	return repeat
 
 
