@@ -88,17 +88,20 @@ def parse_arguments():
 		sys.exit(1)
 
 def check_other_args(wanted, args):
+	"""check that mutual exclusive options are alone"""
 	for arg in args.__dict__:
 		if arg != wanted and arg != "name" and args.__dict__[arg]:
 			return False
 	return True
 
 def get_time_now():
+	"""get current time"""
 	hour = datetime.now().hour
 	minute = datetime.now().minute
 	return hour, minute
 
 def enable_job(name, enable_it):
+	"""enable or disable job(s) by their name"""
 	cron = CronTab(user=True)
 	for job in cron.find_comment(name):
 		job.enable(enable_it)
@@ -150,6 +153,7 @@ def delete_job(name):
 	print("Jobs named '{}' have been deleted.".format(name))
 
 def expand_repetition(repetition):
+	"""expand short day/month names to full day/month names"""
 	for short_day in SHORT_DAYS.keys():
 		repetition = re.sub("\b{}\b".format(short_day), SHORT_DAYS[short_day], repetition)
 	for short_month in SHORT_MONTHS.keys():
@@ -157,6 +161,7 @@ def expand_repetition(repetition):
 	return repetition
 
 def parse_repetition(repetition):
+	"""parse and convert different types of repetition clauses"""
 	repeat = {}
 	repetition = expand_repetition(repetition.lower())
 	# check for: once every 21 minutes
