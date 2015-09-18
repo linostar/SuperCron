@@ -170,7 +170,6 @@ def parse_repetition(repetition):
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
 			repeat['hour_every'] = int(matched.group(2))
-			repeat['min_on'] = get_time_now()[0]
 		else:
 			print("Error: invalid value '{}'. Expected 1-23 for hours.")
 			sys.exit(1)
@@ -178,7 +177,6 @@ def parse_repetition(repetition):
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
 			repeat['day_every'] = int(matched.group(2))
-			[repeat['hour_on'], repeat['min_on']] = get_time_now()
 		else:
 			print("Error: invalid value '{}'. Expected 1-31 for days.")
 			sys.exit(1)
@@ -204,7 +202,7 @@ def parse_repetition(repetition):
 	for match in matched:
 		weekdays.append(DAYS[match.group(2)])
 	if weekdays:
-		[repeat['hour_on'], repeat['min_on']] = get_time_now()
+		
 		repeat['dow_on'] = weekdays
 	matched = re.search(r"(from\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+to\s+" +
 		r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)", repetition)
@@ -212,7 +210,6 @@ def parse_repetition(repetition):
 		weekdays = []
 		weekdays.append(DAYS[matched.group(2)])
 		weekdays.append(DAYS[matched.group(3)])
-		[repeat['hour_on'], repeat['min_on']] = get_time_now()
 		if weekdays[0] < weekdays[1]:
 			repeat['dow_during'] = weekdays
 		else:
@@ -223,6 +220,7 @@ def parse_repetition(repetition):
 				i = (i + 1) % 7
 			dows.append(str(weekdays[1]))
 			repeat['dow_on'] = dows
+	
 	return repeat
 
 
