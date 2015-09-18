@@ -149,9 +149,16 @@ def delete_job(name):
 	cron.write_to_user(user=True)
 	print("Jobs named '{}' have been deleted.".format(name))
 
+def expand_repetition(repetition):
+	for short_day in SHORT_DAYS.keys():
+		repetition = re.sub("\b{}\b".format(short_day), SHORT_DAYS[short_day], repetition)
+	for short_month in SHORT_MONTHS.keys():
+		repetition = re.sub("\b{}\b".format(short_month), SHORT_MONTHS[short_month], repetition)
+	return repetition
+
 def parse_repetition(repetition):
 	repeat = {}
-	repetition = repetition.lower()
+	repetition = expand_repetition(repetition.lower())
 	matched = re.search(r"(once\s+)?every\s+(\d+)\s+minute(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
