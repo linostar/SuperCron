@@ -164,7 +164,7 @@ def parse_repetition(repetition):
 	"""parse and convert different types of repetition clauses"""
 	repeat = {}
 	repetition = expand_repetition(repetition.lower())
-	# check for: once every 21 minutes
+	# check for repetition clauses like: "once every 21 minutes"
 	matched = re.search(r"(once\s+)?every\s+(\d+)\s+minute(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
@@ -172,7 +172,7 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value '{}'. Expected 1-59 for minutes.")
 			sys.exit(1)
-	# check for: once every 3 hours
+	# check for repetition clauses like: "once every 3 hours"
 	matched = re.search(r"(once\s+)?every\s+(\d+)\s+hour(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
@@ -180,7 +180,7 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value '{}'. Expected 1-23 for hours.")
 			sys.exit(1)
-	# check for: once every 11 days
+	# check for repetition clauses like: "once every 11 days"
 	matched = re.search(r"(once\s+)?every\s+(\d+)\s+day(s)?(\.)?", repetition)
 	if matched:
 		if int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
@@ -188,7 +188,7 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value '{}'. Expected 1-31 for days.")
 			sys.exit(1)
-	# check for: 10:32 am
+	# check for repetition clauses like: "10:32 am"
 	matched = re.search(r"(on\s+)?(\d+):(\d+)(\s+(am|pm))?", repetition)
 	if matched:
 		hour = int(matched.group(2))
@@ -206,14 +206,14 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value for hour and/or minute.")
 			sys.exit(1)
-	# check for: on monday
+	# check for repetition clauses like: "on monday"
 	matched = re.finditer(r"(on\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", repetition)
 	weekdays = []
 	for match in matched:
 		weekdays.append(DAYS[match.group(2)])
 	if weekdays:
 		repeat['dow_on'] = weekdays
-	# check for: from monday to friday
+	# check for repetition clauses like: "from monday to friday"
 	matched = re.search(r"(from\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s+to\s+" +
 		r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)", repetition)
 	if matched:
