@@ -196,6 +196,11 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value '{}'. Expected 1-12 for months.")
 			sys.exit(1)
+	# check for repetition clause: "midnight"
+	matched = re.match(r"\bmidnight\b", repetition)
+	if matched:
+		repeat['min_on'] = 0
+		repeat['hour_on'] = 0
 	# check for repetition clauses like: "10:32 am"
 	matched = re.search(r"(on\s*)?\b(\d{1,2}):(\d{1,2})\b(\s*(am|pm))?", repetition)
 	if matched:
