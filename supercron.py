@@ -131,14 +131,14 @@ def add_job(name, command, repeat):
 		job.day.every(repeat['day_every'])
 	if "day_on" in repeat:
 		job.day.on(repeat['day_on'])
-	if "dow_every" in repeat:
-		job.dow.every(repeat['dow_every'])
 	if "dow_on" in repeat:
 		job.dow.on(*repeat['dow_on'])
 	if "dow_during" in repeat:
 		job.dow.during(*repeat['dow_during'])
 	if "month_every" in repeat:
-		job.month.every(*repeat['month_every'])
+		job.month.every(repeat['month_every'])
+	if "month_during" in repeat:
+		job.month.during(*repeat['month_during'])
 	if "month_on" in repeat:
 		job.month.on(*repeat['month_on'])
 	job.enable()
@@ -240,6 +240,23 @@ def parse_repetition(repetition):
 		matched_months.append(MONTHS[match.group(2)])
 	if matched_months:
 		repeat['month_on'] = matched_months
+	# check for repetition clauses like: "from june to august"
+	matched = re.search(r"(from\s+)(january|february|march|april|may|june|july|august|september|october|november|december)" +
+		r"\s+to\s+(january|february|march|april|may|june|july|august|september|october|november|december)", repetition)
+	if matched:
+		matched_months = []
+		matched_months.append(MONTHS[matched.group(2)])
+		matched_months.append(MONTHS[matched.group(3)])
+		if matched_months[0] < matched_months[1]:
+			repeat['month_during'] = matched_months
+		else:
+			consec_months = []
+			i = int(matched_months[0])
+			while != int(matched_months[1]):
+				consec_months.append(str(i))
+				i = (i % 12) + 1
+			consec_months.append(str(matched_months[1]))
+			repeat['month_on'] = consec_months
 	# check if minute and hour fields are empty
 	hour, minute = get_time_now()
 	if not ("min_on" in repeat or "min_every" in repeat):
