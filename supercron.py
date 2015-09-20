@@ -138,9 +138,9 @@ def add_job(name, command, repeat):
 	if "dow_during" in repeat:
 		job.dow.during(*repeat['dow_during'])
 	if "month_every" in repeat:
-		job.month.every(repeat['month_every'])
+		job.month.every(*repeat['month_every'])
 	if "month_on" in repeat:
-		job.month.on(repeat['month_on'])
+		job.month.on(*repeat['month_on'])
 	job.enable()
 	cron.write_to_user(user=True)
 	print("Jobs named '{}' have been successfully added.".format(name))
@@ -207,7 +207,8 @@ def parse_repetition(repetition):
 			print("Error: invalid value for hour and/or minute.")
 			sys.exit(1)
 	# check for repetition clauses like: "on monday"
-	matched = re.finditer(r"(on\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", repetition)
+	m_repetition = repetition.replace(" and ", " on ").replace(",and ", " on ").replace(",", "on ")
+	matched = re.finditer(r"(on\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", m_repetition)
 	weekdays = []
 	for match in matched:
 		weekdays.append(DAYS[match.group(2)])
@@ -230,6 +231,15 @@ def parse_repetition(repetition):
 				i = (i + 1) % 7
 			dows.append(str(weekdays[1]))
 			repeat['dow_on'] = dows
+	# check for repetition clauses like: "on december"
+	m_repetition = repetition.replace(" and ", " on ").replace(",and ", " on ").replace(",", "on ")
+	matched = re.finditer(r"(on\s+)(january|february|march|april|may|june|july|august|september|october|november|december)",
+		m_repetition)
+	matched_months = []
+	for match in matched:
+		matched_months.append(MONTHS[match.group(2)])
+	if matched_months:
+		repeat['month_on'] = matched_months
 	# check if minute and hour fields are empty
 	hour, minute = get_time_now()
 	if not ("min_on" in repeat or "min_every" in repeat):
