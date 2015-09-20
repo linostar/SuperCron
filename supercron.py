@@ -197,7 +197,7 @@ def parse_repetition(repetition):
 			print("Error: invalid value '{}'. Expected 1-12 for months.")
 			sys.exit(1)
 	# check for repetition clauses like: "10:32 am"
-	matched = re.search(r"(on\s+)?(\d+):(\d+)(\s+(am|pm))?", repetition)
+	matched = re.search(r"(on\s*)?\b(\d{1,2}):(\d{1,2})\b(\s*(am|pm))?", repetition)
 	if matched:
 		hour = int(matched.group(2))
 		minute = int(matched.group(3))
@@ -214,6 +214,26 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value for hour and/or minute.")
 			sys.exit(1)
+	# check for repetition clauses like: "19/05"
+	matched = re.search(r"(on\s*)?\b(\d{1,2})[/-](\d{1,2})\b", repetition)
+	if matched:
+		day = int(matched.group(2))
+		month = int(matched.group(3))
+		if month > 12 or month < 1:
+			print("Error: invalid value for month (expected value: 1-12).")
+			sys.exit(1)
+		if month == 2 and (day > 29 or day < 1):
+			print("Error: invalid value for day (expected value: 1-29).")
+			sys.exit(1)
+		if month in (4, 6, 9, 11) and (day > 30 or day < 1):
+			print("Error: invalid value for day (expected value: 1-30).")
+			sys.exit(1)
+		if day > 31 or day < 1:
+			print("Error: invalid value for day (expected value: 1-31).")
+			sys.exit(1)
+		else:
+			repeat['day_on'] = day
+			repeat['month_on'] = month
 	# check for repetition clauses like: "on monday"
 	m_repetition = repetition.replace(" and ", " on ").replace(",and ", " on ").replace(",", "on ")
 	matched = re.finditer(r"(on\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", m_repetition)
