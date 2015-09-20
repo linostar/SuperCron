@@ -188,6 +188,14 @@ def parse_repetition(repetition):
 		else:
 			print("Error: invalid value '{}'. Expected 1-31 for days.")
 			sys.exit(1)
+	# check for repetition clauses like: "once every 3 months"
+	matched = re.search(r"(once\s+)?every\s+(\d+)\s+month(s)?(\.)?", repetition)
+	if matched:
+		if int(matched.group(2)) > 0 and int(matched.group(2)) < 13:
+			repeat['month_every'] = int(matched.group(2))
+		else:
+			print("Error: invalid value '{}'. Expected 1-12 for months.")
+			sys.exit(1)
 	# check for repetition clauses like: "10:32 am"
 	matched = re.search(r"(on\s+)?(\d+):(\d+)(\s+(am|pm))?", repetition)
 	if matched:
