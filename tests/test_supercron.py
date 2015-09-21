@@ -18,8 +18,11 @@ class RunTests(unittest.TestCase):
 	def setUp(self):
 		pass
 
+	def tearDown(self):
+		SuperCron.delete_job("ls")
+
 	def get_crontab(self):
-		p = Popen(["crontab", "-l"], stdout=PIPE)
+		p = Popen(["crontab", "-l"], stdout=PIPE, stderr=PIPE)
 		crontab_out, crontab_err = p.communicate()
 		return crontab_out
 
