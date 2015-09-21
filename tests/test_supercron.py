@@ -26,14 +26,14 @@ class RunTests(unittest.TestCase):
 	def test_midnight(self):
 		entry1 = b"@daily ls # ls"
 		entry2  = b"0 0 * * * ls # ls"
-		SuperCron.add_job("ls", "ls", SuperCron.parse_repetition("midnight"))
+		SuperCron.add_job("ls", "ls", "midnight")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry1 in user_crontab or entry2 in user_crontab)
 
-	def test_every_minutes(self):
+	def test_every_x_minutes(self):
 		hour, minute = SuperCron.get_time_now()
 		entry = b"*/5 {} * * * ls # ls".format(hour)
-		SuperCron.add_job("ls", "ls", SuperCron.parse_repetition("once every 5 minutes"))
+		SuperCron.add_job("ls", "ls", "once every 5 minutes")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 

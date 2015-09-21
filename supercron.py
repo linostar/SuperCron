@@ -122,6 +122,7 @@ class SuperCron:
 	@staticmethod
 	def add_job(name, command, repeat):
 		"""add the job to crontab"""
+		repeat = SuperCron.parse_repetition(repeat)
 		if not repeat:
 			print("Error: invalid repetition clause.")
 			sys.exit(1)
@@ -312,5 +313,5 @@ class SuperCron:
 
 if __name__ == "__main__":
 	name, command, repetition = SuperCron.parse_arguments()
-	SuperCron.add_job(name, command[0], SuperCron.parse_repetition(repetition[0]))
+	SuperCron.add_job(name, command[0], repetition[0])
 	sys.exit(0)
