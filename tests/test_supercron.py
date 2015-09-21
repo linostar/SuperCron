@@ -35,7 +35,7 @@ class RunTests(unittest.TestCase):
 
 	def test_every_x_minutes(self):
 		hour, minute = SuperCron.get_time_now()
-		entry = "*/5 {} * * * ls # ls".format(hour).encode()
+		entry = b"*/5 * * * * ls # ls"
 		SuperCron.add_job("ls", "ls", "once every 5 minutes")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)

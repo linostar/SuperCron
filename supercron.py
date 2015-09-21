@@ -313,7 +313,7 @@ class SuperCron:
 		hour, minute = SuperCron.get_time_now()
 		if not ("min_on" in repeat or "min_every" in repeat):
 			repeat['min_on'] = minute
-		if not ("hour_on" in repeat or "hour_every" in repeat):
+		if not ("hour_on" in repeat or "hour_every" in repeat or "min_every" in repeat):
 			repeat['hour_on'] = hour
 		return repeat
 
