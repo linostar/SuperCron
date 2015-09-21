@@ -30,6 +30,13 @@ class RunTests(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry1 in user_crontab or entry2 in user_crontab)
 
+	def test_every_minutes(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = b"*/5 {} * * * ls # ls".format(hour)
+		SuperCron.add_job("ls", "ls", SuperCron.parse_repetition("once every 5 minutes"))
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 
 if __name__ == "__main__":
 	unittest.main()
