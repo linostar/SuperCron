@@ -19,6 +19,8 @@ class CantUseOptWithOthers(Exception):
 class SuperCron:
 	"""Main SuperCron class"""
 
+	DEBUG = True
+
 	DAYS = {
 		"sunday": "0",
 		"monday": "1",
@@ -47,6 +49,11 @@ class SuperCron:
 	SHORT_DAYS = {key[:3]:key for key in DAYS.keys()}
 
 	SHORT_MONTHS = {key[:3]:key for key in MONTHS.keys()}
+
+	@staticmethod
+	def debug_print(string):
+		if SuperCron.DEBUG:
+			print(string)
 
 	@staticmethod
 	def parse_arguments():
@@ -85,10 +92,10 @@ class SuperCron:
 			else:
 				raise NotEnoughArguments
 		except CantUseOptWithOthers:
-			print("Options '--delete', '--disable' and '--enable' cannot be used with any other options.")
+			SuperCron.debug_print("Options '--delete', '--disable' and '--enable' cannot be used with any other options.")
 			sys.exit(1)
 		except NotEnoughArguments:
-			print("Error: not enough (or invalid) arguments. Type 'supercron --help' for help.")
+			SuperCron.debug_print("Error: not enough (or invalid) arguments. Type 'supercron --help' for help.")
 			sys.exit(1)
 
 	@staticmethod
@@ -117,14 +124,14 @@ class SuperCron:
 		else:
 			action = "disabled"
 		cron.write_to_user(user=True)
-		print("Jobs named '{}' have been {}.".format(name, action))
+		SuperCron.debug_print("Jobs named '{}' have been {}.".format(name, action))
 
 	@staticmethod
 	def add_job(name, command, repeat):
 		"""add the job to crontab"""
 		repeat = SuperCron.parse_repetition(repeat)
 		if not repeat:
-			print("Error: invalid repetition clause.")
+			SuperCron.debug_print("Error: invalid repetition clause.")
 			sys.exit(1)
 		cron = CronTab(user=True)
 		job = cron.new(command=command, comment=name)
@@ -152,7 +159,7 @@ class SuperCron:
 			job.month.on(*repeat['month_on'])
 		job.enable()
 		cron.write_to_user(user=True)
-		print("Jobs named '{}' have been successfully added.".format(name))
+		SuperCron.debug_print("Jobs named '{}' have been successfully added.".format(name))
 
 	@staticmethod
 	def delete_job(name):
@@ -160,7 +167,7 @@ class SuperCron:
 		cron = CronTab(user=True)
 		cron.remove_all(comment=name)
 		cron.write_to_user(user=True)
-		print("Jobs named '{}' have been deleted.".format(name))
+		SuperCron.debug_print("Jobs named '{}' have been deleted.".format(name))
 
 	@staticmethod
 	def expand_repetition(repetition):
@@ -182,7 +189,7 @@ class SuperCron:
 			if int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
 				repeat['min_every'] = int(matched.group(2))
 			else:
-				print("Error: invalid value '{}'. Expected 1-59 for minutes.")
+				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-59 for minutes.")
 				sys.exit(1)
 		# check for repetition clauses like: "once every 3 hours"
 		matched = re.search(r"(once\s+)?every\s+(\d+)\s+hour(s)?(\.)?", repetition)
@@ -190,7 +197,7 @@ class SuperCron:
 			if int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
 				repeat['hour_every'] = int(matched.group(2))
 			else:
-				print("Error: invalid value '{}'. Expected 1-23 for hours.")
+				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-23 for hours.")
 				sys.exit(1)
 		# check for repetition clauses like: "once every 11 days"
 		matched = re.search(r"(once\s+)?every\s+(\d+)\s+day(s)?(\.)?", repetition)
@@ -198,7 +205,7 @@ class SuperCron:
 			if int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
 				repeat['day_every'] = int(matched.group(2))
 			else:
-				print("Error: invalid value '{}'. Expected 1-31 for days.")
+				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-31 for days.")
 				sys.exit(1)
 		# check for repetition clauses like: "once every 3 months"
 		matched = re.search(r"(once\s+)?every\s+(\d+)\s+month(s)?(\.)?", repetition)
@@ -206,7 +213,7 @@ class SuperCron:
 			if int(matched.group(2)) > 0 and int(matched.group(2)) < 13:
 				repeat['month_every'] = int(matched.group(2))
 			else:
-				print("Error: invalid value '{}'. Expected 1-12 for months.")
+				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-12 for months.")
 				sys.exit(1)
 		# check for repetition clause: "midnight"
 		matched = re.match(r"\bmidnight\b", repetition)
@@ -229,7 +236,7 @@ class SuperCron:
 				repeat['min_on'] = minute
 				repeat['hour_on'] = hour
 			else:
-				print("Error: invalid value for hour and/or minute.")
+				SuperCron.debug_print("Error: invalid value for hour and/or minute.")
 				sys.exit(1)
 		# check for repetition clauses like: "19/05"
 		matched = re.search(r"(on\s*)?\b(\d{1,2})[/-](\d{1,2})\b", repetition)
@@ -237,16 +244,16 @@ class SuperCron:
 			day = int(matched.group(2))
 			month = int(matched.group(3))
 			if month > 12 or month < 1:
-				print("Error: invalid value for month (expected value: 1-12).")
+				SuperCron.debug_print("Error: invalid value for month (expected value: 1-12).")
 				sys.exit(1)
 			if month == 2 and (day > 29 or day < 1):
-				print("Error: invalid value for day (expected value: 1-29).")
+				SuperCron.debug_print("Error: invalid value for day (expected value: 1-29).")
 				sys.exit(1)
 			if month in (4, 6, 9, 11) and (day > 30 or day < 1):
-				print("Error: invalid value for day (expected value: 1-30).")
+				SuperCron.debug_print("Error: invalid value for day (expected value: 1-30).")
 				sys.exit(1)
 			if day > 31 or day < 1:
-				print("Error: invalid value for day (expected value: 1-31).")
+				SuperCron.debug_print("Error: invalid value for day (expected value: 1-31).")
 				sys.exit(1)
 			else:
 				repeat['day_on'] = day

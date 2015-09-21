@@ -16,7 +16,7 @@ class RunTests(unittest.TestCase):
 	"""class that tests supercron for behavior correctness"""
 
 	def setUp(self):
-		pass
+		SuperCron.DEBUG = False
 
 	def tearDown(self):
 		SuperCron.delete_job("ls")
