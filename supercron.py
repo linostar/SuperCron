@@ -174,7 +174,7 @@ class SuperCron:
 	def parse_repetition(repetition):
 		"""parse and convert different types of repetition clauses"""
 		repeat = {}
-		repetition = SuerCron.expand_repetition(repetition.lower())
+		repetition = SuperCron.expand_repetition(repetition.lower())
 		# check for repetition clauses like: "once every 21 minutes"
 		matched = re.search(r"(once\s+)?every\s+(\d+)\s+minute(s)?(\.)?", repetition)
 		if matched:

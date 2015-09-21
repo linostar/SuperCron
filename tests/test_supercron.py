@@ -1,20 +1,34 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import sys
 import os
 import unittest
+from subprocess import Popen, PIPE
+
+
+ROOT_DIR = os.path.join(os.path.dirname(__file__), "..")
+sys.path.append(ROOT_DIR)
+
+from supercron import SuperCron
 
 
 class RunTests(unittest.TestCase):
 	"""class that tests supercron for behavior correctness"""
 
 	def setUp(self):
-		ROOT_DIR = os.path.join(os.path.dirname(__file__), "..")
-		sys.path.append(ROOT_DIR)
-		import supercron
+		pass
+
+	def get_crontab(self):
+		p = Popen(["crontab", "-l"], stdout=PIPE)
+		crontab_out, crontab_err = p.communicate()
+		return crontab_out
 
 	def test_midnight(self):
+		entry1 = b"@daily ls # ls"
+		entry2  = b"0 0 * * * ls # ls"
 		SuperCron.add_job("ls", "ls", SuperCron.parse_repetition("midnight"))
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry1 in user_crontab or entry2 in user_crontab)
 
 
 if __name__ == "__main__":
