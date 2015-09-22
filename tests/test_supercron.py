@@ -78,6 +78,34 @@ class RunTests(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_weekdays_single(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * * 2 ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "on tuesdays")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_weekdays_multiple_non_consecutive(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * * 1,3,5 ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "on mondays, wednesdays and fridays")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_weekdays_multiple_forward(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * * 1-4 ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "from monday to thursday")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_weekdays_multiple_backward(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * * 5,6,0,1 ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "from friday to monday")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 
 if __name__ == "__main__":
 	unittest.main()
