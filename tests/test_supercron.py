@@ -101,7 +101,7 @@ class RunTests(unittest.TestCase):
 
 	def test_weekdays_multiple_backward(self):
 		hour, minute = SuperCron.get_time_now()
-		entry = "{} {} * * 5,6,0,1 ls # ls".format(minute, hour).encode()
+		entry = "{} {} * * 0,1,5,6 ls # ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from friday to monday")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
