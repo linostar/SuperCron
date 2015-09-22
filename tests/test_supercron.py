@@ -53,6 +53,12 @@ class RunTests(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_hour_minute_24h(self):
+		entry = b"36 15 * * * ls # ls"
+		SuperCron.add_job("ls", "ls", "on 15:36")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 
 if __name__ == "__main__":
 	unittest.main()
