@@ -257,7 +257,7 @@ class SuperCron:
 				sys.exit(1)
 			else:
 				repeat['day_on'] = day
-				repeat['month_on'] = month
+				repeat['month_on'] = [month]
 		# check for repetition clauses like: "on monday"
 		m_repetition = repetition.replace(" and ", " on ").replace(",and ", " on ").replace(",", "on ")
 		matched = re.finditer(r"(on\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", m_repetition)
