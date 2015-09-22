@@ -173,9 +173,9 @@ class SuperCron:
 	def expand_repetition(repetition):
 		"""expand short day/month names to full day/month names"""
 		for short_day in SuperCron.SHORT_DAYS.keys():
-			repetition = re.sub("\b{}\b".format(short_day), SuperCron.SHORT_DAYS[short_day], repetition)
+			repetition = re.sub(r"\b{}\b".format(short_day), SuperCron.SHORT_DAYS[short_day], repetition)
 		for short_month in SuperCron.SHORT_MONTHS.keys():
-			repetition = re.sub("\b{}\b".format(short_month), SuperCron.SHORT_MONTHS[short_month], repetition)
+			repetition = re.sub(r"\b{}\b".format(short_month), SuperCron.SHORT_MONTHS[short_month], repetition)
 		return repetition
 
 	@staticmethod
