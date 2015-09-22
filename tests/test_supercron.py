@@ -106,6 +106,13 @@ class RunTests(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_short_weekdays(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * * 0,1,5,6 ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "from fri to mon")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 	def test_months_single(self):
 		hour, minute = SuperCron.get_time_now()
 		entry = "{} {} * 5 * ls # ls".format(minute, hour).encode()
@@ -131,6 +138,13 @@ class RunTests(unittest.TestCase):
 		hour, minute = SuperCron.get_time_now()
 		entry = "{} {} * 1,10,11,12 * ls # ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from October to January")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_short_months(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * 1,10,11,12 * ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "from oct to jan")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
