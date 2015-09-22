@@ -106,6 +106,34 @@ class RunTests(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_months_single(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * 5 * ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "in May")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_months_multiple_non_consecutive(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * 2,5,9 * ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "in May and September and February")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_months_multiple_forward(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * 6-8 * ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "from June to August")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_months_multiple_backward(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * 1,10,11,12 * ls # ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "from October to January")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 
 if __name__ == "__main__":
 	unittest.main()

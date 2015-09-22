@@ -284,8 +284,8 @@ class SuperCron:
 				dows.append(str(weekdays[1]))
 				repeat['dow_on'] = dows
 		# check for repetition clauses like: "on december"
-		m_repetition = repetition.replace(" and ", " on ").replace(",and ", " on ").replace(",", "on ")
-		matched = re.finditer(r"(on\s+)(january|february|march|april|may|june|july|august|september|october|november|december)",
+		m_repetition = repetition.replace(" and ", " in ").replace(",and ", " in ").replace(",", "in ")
+		matched = re.finditer(r"([oi]n\s+)(january|february|march|april|may|june|july|august|september|october|november|december)",
 			m_repetition)
 		matched_months = []
 		for match in matched:
