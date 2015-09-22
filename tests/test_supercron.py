@@ -72,6 +72,12 @@ class RunTests(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_mixed_datetime(self):
+		entry = b"8 0 1 6 * ls # ls"
+		SuperCron.add_job("ls", "ls", "1/6 12:08 am")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 
 if __name__ == "__main__":
 	unittest.main()
