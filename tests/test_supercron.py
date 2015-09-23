@@ -154,7 +154,14 @@ class TestJobs(unittest.TestCase):
 
 	def setUp(self):
 		SuperCron.DEBUG = False
+		SuperCron.add_job("pwd", "pwd", "midnight")
 
+	def tearDown(self):
+		SuperCron.delete_job("pwd")
+
+	def test_disable_job(self):
+		SuperCron.enable_job("pwd", False)
+		
 
 if __name__ == "__main__":
 	unittest.main()
