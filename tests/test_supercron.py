@@ -148,6 +148,31 @@ class TestRepetitions(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_mixed_weekday_time(self):
+		entry = b"0 9 * * 1 ls # ls"
+		SuperCron.add_job("ls", "ls", "on monday 09:00")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_mixed_month_time(self):
+		entry = b"55 12 * 8 * ls # ls"
+		SuperCron.add_job("ls", "ls", "in august 12:55 pm")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_mixed_month_weekday_every_x_hours(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} */4 * 4 6 ls # ls".format(minute).encode()
+		SuperCron.add_job("ls", "ls", "every 4 hours on saturdays in april")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_mixed_month_multiple_weekday_multiple_every_x_days_midnight(self):
+		entry = b"0 0 */2 10,12 1-5 ls # ls"
+		SuperCron.add_job("ls", "ls", "midnight every 2 days from monday to friday in october and december")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 
 class TestJobs(unittest.TestCase):
 	"""class that tests supercron for job actions"""
