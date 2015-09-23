@@ -19,6 +19,7 @@ class CantUseOptWithOthers(Exception):
 class SuperCron:
 	"""Main SuperCron class"""
 
+	VERSION = 0.1
 	DEBUG = True
 
 	DAYS = {
@@ -61,7 +62,7 @@ class SuperCron:
 		try:
 			parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
 				description="A utility that translates intelligent schedule commands to crontab entries.",
-				epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j >> some_file\" -r \"every 1 hour\" log_dates" +
+				epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j >> some_file\" -r \"every 2 hours\" log_dates" +
 				"\n\tDelete a job:\tsupercron -d log_dates")
 			parser.add_argument("-r", "--repetition", nargs=1,
 				help="repetition clause (should be enclosed by quotes if it contains spaces)")
@@ -70,8 +71,13 @@ class SuperCron:
 			parser.add_argument("-d", "--delete", action="store_true", help="for deleteing a job")
 			parser.add_argument("--enable", action="store_true", help="for enabling a job")
 			parser.add_argument("--disable", action="store_true", help="for disabling a job")
+			parser.add_argument("-v", "--version", action="version", version="SuperCron v{}".format(
+				SuperCron.VERSION), help="display version number and exit")
+			parser.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 			parser.add_argument("name", help="name of the job")
 			args = parser.parse_args()
+			if args.quiet:
+				SuperCron.DEBUG = False
 			if args.delete:
 				if not SuperCron.check_other_args("delete", args):
 					raise CantUseOptWithOthers
@@ -102,7 +108,7 @@ class SuperCron:
 	def check_other_args(wanted, args):
 		"""check that mutual exclusive options are alone"""
 		for arg in args.__dict__:
-			if arg != wanted and arg != "name" and args.__dict__[arg]:
+			if arg != wanted and arg != "name" and arg != "quiet" and args.__dict__[arg]:
 				return False
 		return True
 
