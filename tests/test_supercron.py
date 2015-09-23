@@ -161,7 +161,10 @@ class TestJobs(unittest.TestCase):
 
 	def test_disable_job(self):
 		SuperCron.enable_job("pwd", False)
-		
+
+	def test_enable_job(self):
+		SuperCron.enable_job("pwd", True)
+
 
 if __name__ == "__main__":
 	unittest.main()
