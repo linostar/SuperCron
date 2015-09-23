@@ -62,8 +62,10 @@ class SuperCron:
 		try:
 			parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
 				description="A utility that translates intelligent schedule commands to crontab entries.",
-				epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j >> some_file\" -r \"every 2 hours\" log_dates" +
-				"\n\tDelete a job:\tsupercron -d log_dates")
+				epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j\" -r \"every 2 hours\" log_dates" +
+				"\n\tDelete a job:\tsupercron -d log_dates" +
+				"\n\tEnable a job:\tsupercron --enable log_dates" +
+				"\n\tDisable a job:\tsupercron --disable log_dates")
 			parser.add_argument("-r", "--repetition", nargs=1,
 				help="repetition clause (should be enclosed by quotes if it contains spaces)")
 			parser.add_argument("-c", "--command", nargs=1,
