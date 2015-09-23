@@ -12,8 +12,8 @@ sys.path.append(ROOT_DIR)
 from supercron import SuperCron
 
 
-class RunTests(unittest.TestCase):
-	"""class that tests supercron for behavior correctness"""
+class TestRepetitions(unittest.TestCase):
+	"""class that tests supercron for repetition parsing"""
 
 	def setUp(self):
 		SuperCron.DEBUG = False
@@ -147,6 +147,13 @@ class RunTests(unittest.TestCase):
 		SuperCron.add_job("ls", "ls", "from oct to jan")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
+
+
+class TestJobs(unittest.TestCase):
+	"""class that tests supercron for job actions"""
+
+	def setUp(self):
+		SuperCron.DEBUG = False
 
 
 if __name__ == "__main__":
