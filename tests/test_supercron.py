@@ -156,7 +156,7 @@ class TestRepetitions(unittest.TestCase):
 
 	def test_mixed_month_time(self):
 		entry = b"55 12 * 8 * ls # ls"
-		SuperCron.add_job("ls", "ls", "in august 12:55 pm")
+		SuperCron.add_job("ls", "ls", "in august at 12:55 pm")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 

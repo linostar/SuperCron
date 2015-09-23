@@ -216,12 +216,12 @@ class SuperCron:
 				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-12 for months.")
 				sys.exit(1)
 		# check for repetition clause: "midnight"
-		matched = re.match(r"\bmidnight\b", repetition)
+		matched = re.match(r"(at\s*)?\bmidnight\b", repetition)
 		if matched:
 			repeat['min_on'] = 0
 			repeat['hour_on'] = 0
 		# check for repetition clauses like: "10:32 am"
-		matched = re.search(r"(on\s*)?\b(\d{1,2}):(\d{1,2})\b(\s*(am|pm))?", repetition)
+		matched = re.search(r"(on|at\s*)?\b(\d{1,2}):(\d{1,2})\b(\s*(am|pm))?", repetition)
 		if matched:
 			hour = int(matched.group(2))
 			minute = int(matched.group(3))
@@ -259,7 +259,7 @@ class SuperCron:
 				repeat['day_on'] = day
 				repeat['month_on'] = [month]
 		# check for repetition clauses like: "on monday"
-		m_repetition = repetition.replace(" and ", " on ").replace(",and ", " on ").replace(",", "on ")
+		m_repetition = repetition.replace(" and ", " on ").replace(",and ", " on ").replace(",", " on ")
 		matched = re.finditer(r"(on\s+)(monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?", m_repetition)
 		weekdays = []
 		for match in matched:
