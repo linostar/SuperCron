@@ -310,11 +310,12 @@ class SuperCron:
 				consec_months.append(str(matched_months[1]))
 				repeat['month_on'] = consec_months
 		# check if minute and hour fields are empty
-		hour, minute = SuperCron.get_time_now()
-		if not ("min_on" in repeat or "min_every" in repeat):
-			repeat['min_on'] = minute
-		if not ("hour_on" in repeat or "hour_every" in repeat or "min_every" in repeat):
-			repeat['hour_on'] = hour
+		if repeat:
+			hour, minute = SuperCron.get_time_now()
+			if not ("min_on" in repeat or "min_every" in repeat):
+				repeat['min_on'] = minute
+			if not ("hour_on" in repeat or "hour_every" in repeat or "min_every" in repeat):
+				repeat['hour_on'] = hour
 		return repeat
 
 
