@@ -184,38 +184,46 @@ class SuperCron:
 		repeat = {}
 		repetition = SuperCron.expand_repetition(repetition.lower())
 		# check for repetition clauses like: "once every 21 minutes"
-		matched = re.search(r"(once\s+)?every\s+(\d+)\s+minute(s)?(\.)?", repetition)
+		matched = re.search(r"(once\s+)?every\s+(\d+\s+)?minute(s)?", repetition)
 		if matched:
-			if int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
+			if not matched.group(2):
+				repeat['min_every'] = 1
+			elif int(matched.group(2)) > 0 and int(matched.group(2)) < 60:
 				repeat['min_every'] = int(matched.group(2))
 			else:
 				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-59 for minutes.")
 				sys.exit(1)
 		# check for repetition clauses like: "once every 3 hours"
-		matched = re.search(r"(once\s+)?every\s+(\d+)\s+hour(s)?(\.)?", repetition)
+		matched = re.search(r"(once\s+)?every\s+(\d+\s+)?hour(s)?", repetition)
 		if matched:
-			if int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
+			if not matched.group(2):
+				repeat['hour_every'] = 1
+			elif int(matched.group(2)) > 0 and int(matched.group(2)) < 24:
 				repeat['hour_every'] = int(matched.group(2))
 			else:
 				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-23 for hours.")
 				sys.exit(1)
 		# check for repetition clauses like: "once every 11 days"
-		matched = re.search(r"(once\s+)?every\s+(\d+)\s+day(s)?(\.)?", repetition)
+		matched = re.search(r"(once\s+)?every\s+(\d+\s+)?day(s)?", repetition)
 		if matched:
-			if int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
+			if not matched.group(2):
+				repeat['day_every'] = 1
+			elif int(matched.group(2)) > 0 and int(matched.group(2)) < 460:
 				repeat['day_every'] = int(matched.group(2))
 			else:
 				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-31 for days.")
 				sys.exit(1)
 		# check for repetition clauses like: "once every 3 months"
-		matched = re.search(r"(once\s+)?every\s+(\d+)\s+month(s)?(\.)?", repetition)
+		matched = re.search(r"(once\s+)?every\s+(\d+\s+)?month(s)?", repetition)
 		if matched:
-			if int(matched.group(2)) > 0 and int(matched.group(2)) < 13:
+			if not matched.group(2):
+				repeat['month_every'] = 1
+			elif int(matched.group(2)) > 0 and int(matched.group(2)) < 13:
 				repeat['month_every'] = int(matched.group(2))
 			else:
 				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-12 for months.")
 				sys.exit(1)
-		# check for repetition clause: "midnight"
+		# check for repetition clause: "at midnight"
 		matched = re.match(r"(at\s*)?\bmidnight\b", repetition)
 		if matched:
 			repeat['min_on'] = 0
