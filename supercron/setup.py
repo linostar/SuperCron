@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 setup(
 	name = 'supercron',
 	packages = ['supercron'],
@@ -9,6 +9,7 @@ setup(
 	license = 'BSD',
 	url = 'https://github.com/linostar/SuperCron',
 	download_url = 'https://github.com/linostar/SuperCron/tarball/0.1',
+	packages = ['supercron', 'tests'],
 	keywords = ['cron', 'crontab', 'scheduling'],
 	install_requires = ['python-crontab>=1.9.3'],
 	classifiers = [
