@@ -65,7 +65,8 @@ class SuperCron:
 				epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j\" -r \"every 2 hours\" log_dates" +
 				"\n\tDelete a job:\tsupercron -d log_dates" +
 				"\n\tEnable a job:\tsupercron --enable log_dates" +
-				"\n\tDisable a job:\tsupercron --disable log_dates")
+				"\n\tDisable a job:\tsupercron --disable log_dates" +
+				"\n\tClear all jobs:\tsupercron clear")
 			parser.add_argument("-r", "--repetition", nargs=1,
 				help="repetition clause (should be enclosed by quotes if it contains spaces)")
 			parser.add_argument("-c", "--command", nargs=1,
@@ -143,28 +144,31 @@ class SuperCron:
 			sys.exit(1)
 		cron = CronTab(user=True)
 		job = cron.new(command=command, comment=name)
-		if "min_every" in repeat:
-			job.minute.every(repeat['min_every'])
-		if "min_on" in repeat:
-			job.minute.on(repeat['min_on'])
-		if "hour_every" in repeat:
-			job.hour.every(repeat['hour_every'])
-		if "hour_on" in repeat:
-			job.hour.on(repeat['hour_on'])
-		if "day_every" in repeat:
-			job.day.every(repeat['day_every'])
-		if "day_on" in repeat:
-			job.day.on(repeat['day_on'])
-		if "dow_on" in repeat:
-			job.dow.on(*repeat['dow_on'])
-		if "dow_during" in repeat:
-			job.dow.during(*repeat['dow_during'])
-		if "month_every" in repeat:
-			job.month.every(repeat['month_every'])
-		if "month_during" in repeat:
-			job.month.during(*repeat['month_during'])
-		if "month_on" in repeat:
-			job.month.on(*repeat['month_on'])
+		if "reboot" in repeat:
+			job.every_reboot()
+		else:
+			if "min_every" in repeat:
+				job.minute.every(repeat['min_every'])
+			if "min_on" in repeat:
+				job.minute.on(repeat['min_on'])
+			if "hour_every" in repeat:
+				job.hour.every(repeat['hour_every'])
+			if "hour_on" in repeat:
+				job.hour.on(repeat['hour_on'])
+			if "day_every" in repeat:
+				job.day.every(repeat['day_every'])
+			if "day_on" in repeat:
+				job.day.on(repeat['day_on'])
+			if "dow_on" in repeat:
+				job.dow.on(*repeat['dow_on'])
+			if "dow_during" in repeat:
+				job.dow.during(*repeat['dow_during'])
+			if "month_every" in repeat:
+				job.month.every(repeat['month_every'])
+			if "month_during" in repeat:
+				job.month.during(*repeat['month_during'])
+			if "month_on" in repeat:
+				job.month.on(*repeat['month_on'])
 		job.enable()
 		cron.write_to_user(user=True)
 		SuperCron.debug_print("Jobs named '{}' have been successfully added.".format(name))
@@ -191,6 +195,10 @@ class SuperCron:
 		"""parse and convert different types of repetition clauses"""
 		repeat = {}
 		repetition = SuperCron.expand_repetition(repetition.lower())
+		# check for repetition clauses like: "every reboot"
+		matched = re.search(r"(at|every)\s+(boot|reboot)", repetition)
+		if matched:
+			repeat['reboot'] = True
 		# check for repetition clauses like: "once every 21 minutes"
 		matched = re.search(r"(once\s+)?every\s+(\d+\s+)?minute(s)?", repetition)
 		if matched:
@@ -335,11 +343,23 @@ class SuperCron:
 		return repeat
 
 	@staticmethod
+	def clear_jobs():
+		print("Note: this will not affect crontab entries not added by SuperCron.")
+		sure = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
+		if sure == "y":
+			print("All jobs have been removed from your crontab.")
+		else:
+			print("Cancelled.")
+
+	@staticmethod
 	def interactive_mode():
 		print("SuperCron (interactive mode)")
 		print("")
-		action = raw_input("Action [add/delete/enable/disable]: ")
+		action = raw_input("Action [add/delete/enable/disable/clear]: ")
 		action = action.lower().strip()
+		if action == "clear":
+			SuperCron.clear_jobs()
+			return
 		name = raw_input("Job name: ")
 		if action == "add":
 			command = raw_input("Command to be executed: ")
@@ -358,6 +378,8 @@ class SuperCron:
 def main():
 	if len(sys.argv) == 1:
 		SuperCron.interactive_mode()
+	elif len(sys.argv) == 2 and sys.arv[1] == "clear":
+		SuperCron.clear_jobs()
 	else:
 		name, command, repetition = SuperCron.parse_arguments()
 		SuperCron.add_job(name, command[0], repetition[0])
