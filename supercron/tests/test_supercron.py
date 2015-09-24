@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 ROOT_DIR = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(ROOT_DIR)
 
-from supercron import SuperCron
+from supercron.supercron import SuperCron
 
 
 class TestRepetitions(unittest.TestCase):
