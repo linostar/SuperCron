@@ -21,6 +21,7 @@ class SuperCron:
 
 	VERSION = 0.2
 	DEBUG = True
+	PREFIX = "SuperCron__"
 
 	DAYS = {
 		"sunday": "0",
@@ -126,7 +127,7 @@ class SuperCron:
 	def enable_job(name, enable_it):
 		"""enable or disable job(s) by their name"""
 		cron = CronTab(user=True)
-		for job in cron.find_comment(name):
+		for job in cron.find_comment(SuperCron.PREFIX + str(name)):
 			job.enable(enable_it)
 		if enable_it:
 			action = "enabled"
@@ -138,12 +139,12 @@ class SuperCron:
 	@staticmethod
 	def add_job(name, command, repeat):
 		"""add the job to crontab"""
-		repeat = SuperCron.parse_repetition(repeat)
+		repeat = SuperCron.parse_repetition(str(repeat))
 		if not repeat:
 			SuperCron.debug_print("Error: invalid repetition clause.")
 			sys.exit(1)
 		cron = CronTab(user=True)
-		job = cron.new(command=command, comment=name)
+		job = cron.new(command=str(command), comment=SuperCron.PREFIX + str(name))
 		if "reboot" in repeat:
 			job.every_reboot()
 		else:
@@ -177,7 +178,7 @@ class SuperCron:
 	def delete_job(name):
 		"""delete the specified job from user's crontab"""
 		cron = CronTab(user=True)
-		cron.remove_all(comment=name)
+		cron.remove_all(comment=SuperCron.PREFIX + str(name))
 		cron.write_to_user(user=True)
 		SuperCron.debug_print("Jobs named '{}' have been deleted.".format(name))
 
@@ -347,7 +348,16 @@ class SuperCron:
 		print("Note: this will not affect crontab entries not added by SuperCron.")
 		sure = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
 		if sure == "y":
-			print("All jobs have been removed from your crontab.")
+			count = 0
+			cron = CronTab(user=True)
+			for job in cron:
+				if job.comment.startswith(SuperCron.PREFIX):
+					cron.remove(job)
+					count += 1
+			if count == 1:
+				print("1 job has been removed from your crontab.")
+			else:
+				print("{} jobs have been removed from your crontab.".format(count))
 		else:
 			print("Cancelled.")
 
