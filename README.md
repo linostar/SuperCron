@@ -5,6 +5,6 @@ Intelligent interface to cron in UNIX systems.
 
 ## Installation
 
-```pip install supercron```
+Run: `pip install supercron`
 
 ## Usage
