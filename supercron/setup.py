@@ -2,13 +2,13 @@ from setuptools import setup
 setup(
 	name = 'supercron',
 	packages = ['supercron', 'tests'],
-	version = '0.1.2',
-	description = 'Intelligent interface to cron in UNIX systems',
+	version = '0.2.0',
+	description ='Intelligent interface to cron in UNIX systems',
 	author = 'Anas El Husseini',
 	author_email = 'linux.anas@gmail.com',
 	license = 'BSD',
 	url = 'https://github.com/linostar/SuperCron',
-	download_url = 'https://github.com/linostar/SuperCron/tarball/0.1',
+	download_url = 'https://github.com/linostar/SuperCron/tarball/0.2',
 	keywords = ['cron', 'crontab', 'scheduling'],
 	install_requires = ['python-crontab>=1.9.3'],
 	entry_points = {

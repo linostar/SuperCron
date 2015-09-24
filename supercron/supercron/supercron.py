@@ -19,7 +19,7 @@ class CantUseOptWithOthers(Exception):
 class SuperCron:
 	"""Main SuperCron class"""
 
-	VERSION = 0.1
+	VERSION = 0.2
 	DEBUG = True
 
 	DAYS = {
@@ -73,7 +73,7 @@ class SuperCron:
 			parser.add_argument("-d", "--delete", action="store_true", help="for deleteing a job")
 			parser.add_argument("--enable", action="store_true", help="for enabling a job")
 			parser.add_argument("--disable", action="store_true", help="for disabling a job")
-			parser.add_argument("-v", "--version", action="version", version="SuperCron v{}".format(
+			parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
 				SuperCron.VERSION), help="display version number and exit")
 			parser.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 			parser.add_argument("name", help="name of the job")
@@ -334,10 +334,33 @@ class SuperCron:
 				repeat['hour_on'] = hour
 		return repeat
 
+	@staticmethod
+	def interactive_mode():
+		print("SuperCron (interactive mode)")
+		print("")
+		action = raw_input("Action [add/delete/enable/disable]: ")
+		action = action.lower().strip()
+		name = raw_input("Job name: ")
+		if action == "add":
+			command = raw_input("Command to be executed: ")
+			repetition = raw_input("Repetition sentence: ")
+			SuperCron.add_job(name, command, repetition)
+		elif action == "delete":
+			SuperCron.delete_job(name)
+		elif action == "enable":
+			SuperCron.enable_job(name, True)
+		elif action == "disable":
+			SuperCron.enable_job(name, False)
+		else:
+			print("Error: action '{}' not recognized.".format(action))
+
 
 def main():
-	name, command, repetition = SuperCron.parse_arguments()
-	SuperCron.add_job(name, command[0], repetition[0])
+	if len(sys.argv) == 1:
+		SuperCron.interactive_mode()
+	else:
+		name, command, repetition = SuperCron.parse_arguments()
+		SuperCron.add_job(name, command[0], repetition[0])
 	sys.exit(0)
 
 if __name__ == "__main__":
