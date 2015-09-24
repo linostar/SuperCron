@@ -1,7 +1,7 @@
 from distutils.core import setup
 setup(
-	name = 'SuperCron',
-	packages = ['SuperCron'],
+	name = 'supercron',
+	packages = ['supercron'],
 	version = '0.1',
 	description = 'Intelligent interface to cron in UNIX systems',
 	author = 'Anas El Husseini',
