@@ -354,6 +354,7 @@ class SuperCron:
 				if job.comment.startswith(SuperCron.PREFIX):
 					cron.remove(job)
 					count += 1
+			cron.write_to_user(user=True)
 			if count == 1:
 				print("1 job has been removed from your crontab.")
 			else:
@@ -374,12 +375,16 @@ class SuperCron:
 		if action == "add":
 			command = raw_input("Command to be executed: ")
 			repetition = raw_input("Repetition sentence: ")
+			print("")
 			SuperCron.add_job(name, command, repetition)
 		elif action == "delete":
+			print("")
 			SuperCron.delete_job(name)
 		elif action == "enable":
+			print("")
 			SuperCron.enable_job(name, True)
 		elif action == "disable":
+			print("")
 			SuperCron.enable_job(name, False)
 		else:
 			print("Error: action '{}' not recognized.".format(action))
@@ -388,7 +393,7 @@ class SuperCron:
 def main():
 	if len(sys.argv) == 1:
 		SuperCron.interactive_mode()
-	elif len(sys.argv) == 2 and sys.arv[1] == "clear":
+	elif len(sys.argv) == 2 and sys.argv[1] == "clear":
 		SuperCron.clear_jobs()
 	else:
 		name, command, repetition = SuperCron.parse_arguments()
