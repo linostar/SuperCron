@@ -335,7 +335,10 @@ class SuperCron:
 		return repeat
 
 
-if __name__ == "__main__":
+def main():
 	name, command, repetition = SuperCron.parse_arguments()
 	SuperCron.add_job(name, command[0], repetition[0])
 	sys.exit(0)
+
+if __name__ == "__main__":
+	main()
