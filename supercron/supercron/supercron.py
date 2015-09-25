@@ -76,6 +76,7 @@ class SuperCron:
 			parser.add_argument("-d", "--delete", action="store_true", help="for deleteing a job")
 			parser.add_argument("--enable", action="store_true", help="for enabling a job")
 			parser.add_argument("--disable", action="store_true", help="for disabling a job")
+			parser.add_argument("--search", action="store_true", help="searches for a job by name, command or repetition")
 			parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
 				SuperCron.VERSION), help="display version number and exit")
 			parser.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
@@ -97,6 +98,11 @@ class SuperCron:
 				if not SuperCron.check_other_args("disable", args):
 					raise CantUseOptWithOthers
 				SuperCron.enable_job(args.name, False)
+				sys.exit(0)
+			if args.search:
+				if not SuperCron.check_other_args("search", args):
+					raise CantUseOptWithOthers
+				SuperCron.search_job(args.name)
 				sys.exit(0)
 			if args.repetition and args.command:
 				return args.name, args.command, args.repetition
@@ -382,8 +388,13 @@ class SuperCron:
 			SuperCron.debug_print("Cancelled.")
 
 	@staticmethod
+	def search_job(name):
+		"""That moment when you have to rely on a function to look for a job"""
+		pass
+
+	@staticmethod
 	def interactive_mode():
-		action_list = ("add", "delete", "enable", "disable", "clear")
+		action_list = ("add", "delete", "enable", "disable", "search", "clear")
 		SuperCron.debug_print("SuperCron (interactive mode)")
 		SuperCron.debug_print("")
 		action = raw_input("Action [add/delete/enable/disable/clear]: ")
@@ -410,6 +421,9 @@ class SuperCron:
 		elif action == "disable":
 			SuperCron.debug_print("")
 			SuperCron.enable_job(name, False)
+		elif action == "search":
+			SuperCron.debug_print("")
+			SuperCron.search_job(name)
 
 
 def main():
