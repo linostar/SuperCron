@@ -22,6 +22,7 @@ class SuperCron:
 	VERSION = 0.2
 	DEBUG = True
 	PREFIX = "SuperCron__"
+	TOBEDELETED = PREFIX + "TOBEDELETED"
 
 	DAYS = {
 		"sunday": "0",
@@ -359,14 +360,15 @@ class SuperCron:
 	@staticmethod
 	def clear_jobs():
 		print("Note: this will not affect crontab entries not added by SuperCron.")
-		sure = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
-		if sure == "y":
+		confirm_clear = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
+		if confirm_clear == "y":
 			count = 0
 			cron = CronTab(user=True)
 			for job in cron:
 				if job.comment.startswith(SuperCron.PREFIX):
-					cron.remove(job)
+					job.comment = SuperCron.TOBEDELETED
 					count += 1
+			cron.remove_all(comment=SuperCron.TOBEDELETED)
 			cron.write_to_user(user=True)
 			if count == 1:
 				print("1 job has been removed from your crontab.")
