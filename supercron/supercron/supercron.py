@@ -68,6 +68,7 @@ class SuperCron:
 				"\n\tDelete a job:\tsupercron -d log_dates" +
 				"\n\tEnable a job:\tsupercron --enable log_dates" +
 				"\n\tDisable a job:\tsupercron --disable log_dates" +
+				"\n\tSearch jobs:\tsupercron --search log_dates" +
 				"\n\tClear all jobs:\tsupercron clear")
 			parser.add_argument("-r", "--repetition", nargs=1,
 				help="repetition clause (should be enclosed by quotes if it contains spaces)")
@@ -390,14 +391,42 @@ class SuperCron:
 	@staticmethod
 	def search_job(name):
 		"""That moment when you have to rely on a function to look for a job"""
-		pass
+		job_list = []
+		cron = CronTab(user=True)
+		if name == "@all":
+			for job in cron:
+				if job.comment.startswith(SuperCron.PREFIX):
+					job_name = job.comment[len(SuperCron.PREFIX):]
+				else:
+					job_name = job.comment
+				job_list.append([job_name, str(job.slices), job.command])
+		elif name == "@supercron":
+			for job in cron:
+				if job.comment.startswith(SuperCron.PREFIX):
+					job_name = job.comment[len(SuperCron.PREFIX):]
+					job_list.append([job_name, str(job.slices), job.command])
+		else:
+			jobs = cron.find_comment(SuperCron.PREFIX + str(name))
+			for job in jobs:
+				job_list.append([str(name), str(job.slices), job.command])
+		if job_list:
+			col_widths = []
+			col_titles = ["Name", "Repetition", "Command"]
+			for i in range(0, 3):
+				col_widths.append(max(max(len(n[i]) for n in job_list) + 2, len(col_titles[i]) + 2))
+			SuperCron.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(col_titles, range(0, 3))))
+			SuperCron.debug_print("-" * (sum(col_widths) - 2))
+			for job_item in job_list:
+				SuperCron.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(job_item, range(0, 3))))
+		else:
+			SuperCron.debug_print("Zero search results.")
 
 	@staticmethod
 	def interactive_mode():
 		action_list = ("add", "delete", "enable", "disable", "search", "clear")
 		SuperCron.debug_print("SuperCron (interactive mode)")
 		SuperCron.debug_print("")
-		action = raw_input("Action [add/delete/enable/disable/clear]: ")
+		action = raw_input("Action [add/delete/enable/disable/search/clear]: ")
 		action = str(action.lower().strip())
 		if action not in action_list:
 			SuperCron.debug_print("Error: action '{}' not recognized.".format(action))
