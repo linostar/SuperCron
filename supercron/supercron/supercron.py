@@ -54,8 +54,8 @@ class SuperCron:
 	SHORT_MONTHS = {key[:3]:key for key in MONTHS.keys()}
 
 	@staticmethod
-	def debug_print(string):
-		if SuperCron.DEBUG:
+	def debug_print(string, force_print=False):
+		if SuperCron.DEBUG or force_print:
 			print(string)
 
 	@staticmethod
@@ -363,7 +363,7 @@ class SuperCron:
 
 	@staticmethod
 	def clear_jobs():
-		print("Note: this will not affect crontab entries not added by SuperCron.")
+		SuperCron.debug_print("Note: this will not affect crontab entries not added by SuperCron.")
 		confirm_clear = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
 		if confirm_clear == "y":
 			count = 0
@@ -375,39 +375,41 @@ class SuperCron:
 			cron.remove_all(comment=SuperCron.TOBEDELETED)
 			cron.write_to_user(user=True)
 			if count == 1:
-				print("1 job has been removed from your crontab.")
+				SuperCron.debug_print("1 job has been removed from your crontab.")
 			else:
-				print("{} jobs have been removed from your crontab.".format(count))
+				SuperCron.debug_print("{} jobs have been removed from your crontab.".format(count))
 		else:
-			print("Cancelled.")
+			SuperCron.debug_print("Cancelled.")
 
 	@staticmethod
 	def interactive_mode():
-		print("SuperCron (interactive mode)")
-		print("")
+		action_list = ("add", "delete", "enable", "disable", "clear")
+		SuperCron.debug_print("SuperCron (interactive mode)")
+		SuperCron.debug_print("")
 		action = raw_input("Action [add/delete/enable/disable/clear]: ")
-		action = action.lower().strip()
+		action = str(action.lower().strip())
+		if action not in action_list:
+			SuperCron.debug_print("Error: action '{}' not recognized.".format(action))
+			sys.exit(1)
 		if action == "clear":
-			print("")
+			SuperCron.debug_print("")
 			SuperCron.clear_jobs()
 			return
 		name = raw_input("Job name: ")
 		if action == "add":
 			command = raw_input("Command to be executed: ")
 			repetition = raw_input("Repetition sentence: ")
-			print("")
+			SuperCron.debug_print("")
 			SuperCron.add_job(name, command, repetition)
 		elif action == "delete":
-			print("")
+			SuperCron.debug_print("")
 			SuperCron.delete_job(name)
 		elif action == "enable":
-			print("")
+			SuperCron.debug_print("")
 			SuperCron.enable_job(name, True)
 		elif action == "disable":
-			print("")
+			SuperCron.debug_print("")
 			SuperCron.enable_job(name, False)
-		else:
-			print("Error: action '{}' not recognized.".format(action))
 
 
 def main():
