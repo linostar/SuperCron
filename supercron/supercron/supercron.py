@@ -177,10 +177,17 @@ class SuperCron:
 	@staticmethod
 	def delete_job(name):
 		"""delete the specified job from user's crontab"""
+		count = 0
 		cron = CronTab(user=True)
-		cron.remove_all(comment=SuperCron.PREFIX + str(name))
+		for job in cron:
+			if job.comment == SuperCron.PREFIX + str(name):
+				cron.remove(job)
+				count += 1
 		cron.write_to_user(user=True)
-		SuperCron.debug_print("Jobs named '{}' have been deleted.".format(name))
+		if count == 1:
+			SuperCron.debug_print("1 job named '{}' has been deleted.".format(name))
+		else:
+			SuperCron.debug_print("{} jobs named '{}' have been deleted.".format(count, name))
 
 	@staticmethod
 	def expand_repetition(repetition):
@@ -369,6 +376,7 @@ class SuperCron:
 		action = raw_input("Action [add/delete/enable/disable/clear]: ")
 		action = action.lower().strip()
 		if action == "clear":
+			print("")
 			SuperCron.clear_jobs()
 			return
 		name = raw_input("Job name: ")
