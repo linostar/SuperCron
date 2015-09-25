@@ -33,6 +33,13 @@ class TestRepetitions(unittest.TestCase):
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry1 in user_crontab or entry2 in user_crontab)
 
+	def test_everyday(self):
+		hour, minute = SuperCron.get_time_now()
+		entry = "{} {} * * * ls # SuperCron__ls".format(minute, hour).encode()
+		SuperCron.add_job("ls", "ls", "everyday")
+		user_crontab = self.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 	def test_at_boot(self):
 		entry = b"@reboot ls # SuperCron__ls"
 		SuperCron.add_job("ls", "ls", "at reboot")

@@ -254,6 +254,10 @@ class SuperCron:
 			else:
 				SuperCron.debug_print("Error: invalid value '{}'. Expected 1-12 for months.")
 				sys.exit(1)
+		# check for repetition clause: "everyday"
+		matched = re.match(r"\b(everyday|anyday)\b", repetition)
+		if matched:
+			repeat['day_every'] = 1
 		# check for repetition clause: "at midnight"
 		matched = re.match(r"(at\s*)?\bmidnight\b", repetition)
 		if matched:
