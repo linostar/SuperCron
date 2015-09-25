@@ -129,7 +129,7 @@ class SuperCron:
 		count = 0
 		cron = CronTab(user=True)
 		for job in cron:
-			if job.comment == SuperCron.PREFIX + str(name):
+			if job.comment == SuperCron.PREFIX + str(name) and job.is_enabled() != enable_it:
 				job.enable(enable_it)
 				count += 1
 		if enable_it:
