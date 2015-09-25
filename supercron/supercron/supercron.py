@@ -126,15 +126,21 @@ class SuperCron:
 	@staticmethod
 	def enable_job(name, enable_it):
 		"""enable or disable job(s) by their name"""
+		count = 0
 		cron = CronTab(user=True)
-		for job in cron.find_comment(SuperCron.PREFIX + str(name)):
-			job.enable(enable_it)
+		for job in cron:
+			if job.comment == SuperCron.PREFIX + str(name):
+				job.enable(enable_it)
+				count += 1
 		if enable_it:
 			action = "enabled"
 		else:
 			action = "disabled"
 		cron.write_to_user(user=True)
-		SuperCron.debug_print("Jobs named '{}' have been {}.".format(name, action))
+		if count == 1:
+			SuperCron.debug_print("1 job named '{}' has been {}.".format(name, action))
+		else:
+			SuperCron.debug_print("{} jobs named '{}' have been {}.".format(count, name, action))
 
 	@staticmethod
 	def add_job(name, command, repeat):
