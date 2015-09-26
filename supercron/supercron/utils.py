@@ -1,4 +1,5 @@
 from datetime import datetime
+from subprocess import Popen, PIPE
 
 class Utils:
 	"""class that contains different utilities functions"""
@@ -53,3 +54,9 @@ class Utils:
 		args_dict['command'] = [command]
 		args_dict['repetition'] = [repetition]
 		return args_dict
+
+	@staticmethod
+	def get_crontab():
+		p = Popen(["crontab", "-l"], stdout=PIPE, stderr=PIPE)
+		crontab_out, crontab_err = p.communicate()
+		return crontab_out
