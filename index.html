@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>Supercron by linostar</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Supercron</h1>
+        <h2>Intelligent interface to cron in UNIX systems</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/linostar/SuperCron/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/linostar/SuperCron/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/linostar/SuperCron" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a id="supercron" class="anchor" href="#supercron" aria-hidden="true"><span class="octicon octicon-link"></span></a>SuperCron</h1>
+
+<p>Intelligent interface to cron in UNIX systems.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Run <code>pip install supercron</code> or <code>easy_install supercron</code>.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>SuperCron can run either in interactive mode or non-interactive mode.</p>
+
+<p><strong>Interactive mode:</strong></p>
+
+<p>Run <code>supercron</code> without any arguments to start interactive mode. You will prompted to choose an action, and then to enter action parameters (like <code>name</code>, <code>command</code> and <code>repetition</code>) if any.</p>
+
+<p><strong>Non-interactive mode:</strong></p>
+
+<p>In non-interactive mode, at least one of the following options/arguments has to be used after the command name <code>supercron</code>.</p>
+
+<ul>
+<li>option <code>-h</code> or <code>--help</code>: shows the help message, with some usage examples</li>
+<li>option <code>-V</code> or <code>--version</code>: displays the version number</li>
+</ul>
+
+<p>Additionally, one of the following subcommands can be used: add, delete, enable, disable, search, clear.</p>
+
+<p><strong><em>Subcommand add</em></strong></p>
+
+<ul>
+<li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
+<li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
+<li>option <code>-c</code> or <code>--command</code>: required; here goes the command to be executed</li>
+<li>option <code>-r</code> or <code>--repetition</code>: required; the repetition sentence (see examples below)</li>
+<li>argument <code>name</code>: required; represents the job name which will be added</li>
+</ul>
+
+<p><strong><em>Subcommands delete, enable and disable</em></strong></p>
+
+<ul>
+<li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
+<li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
+<li>argument <code>name</code>: required; represents the job name on which the action will occur</li>
+</ul>
+
+<p><strong><em>Subcommand search</em></strong></p>
+
+<ul>
+<li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
+<li>argument <code>name</code>: required; the exact job name to search for, or <code>@supercron</code> to list all SuperCron jobs, or <code>@all</code> to list all user's crontab entries</li>
+</ul>
+
+<p><strong><em>Subcommand clear</em></strong></p>
+
+<p>It will only clear SuperCron jobs from user's crontab:</p>
+
+<ul>
+<li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
+</ul>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<ul>
+<li>Add a job:</li>
+</ul>
+
+<pre><code>supercron add -c "date +%j &gt;&gt; log_file" -r "every 2 days" log_dates
+supercron add -c "scp -r /path1 user@server:/path2" -r "at 11:50 pm on mondays" backup_server
+</code></pre>
+
+<ul>
+<li>Delete a job:</li>
+</ul>
+
+<pre><code>supercron delete log_dates
+</code></pre>
+
+<ul>
+<li>Enable a job:</li>
+</ul>
+
+<pre><code>supercron enable log_dates
+</code></pre>
+
+<ul>
+<li>Disable a job:</li>
+</ul>
+
+<pre><code>supercron disable log_dates
+</code></pre>
+
+<ul>
+<li>Search jobs:</li>
+</ul>
+
+<pre><code>supercron search log_dates
+supercron search @supercron
+supercron search @all
+</code></pre>
+
+<ul>
+<li>Clear all SuperCron jobs:</li>
+</ul>
+
+<pre><code>supercron clear
+</code></pre>
+
+<h2>
+<a id="repetition-sentences" class="anchor" href="#repetition-sentences" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repetition sentences</h2>
+
+<p>Repetition sentences are provided in a <code>supercron add</code> command directly after the <code>-r</code> or <code>--repetition</code> option.</p>
+
+<p>Examples of accepted repetition sentences (case insensitive):</p>
+
+<ul>
+<li>everyday</li>
+<li>at midnight</li>
+<li>every 5 minutes</li>
+<li>once every 2 hours</li>
+<li>every 10 days</li>
+<li>every 4 months</li>
+<li>on mondays</li>
+<li>on monday, wednesday and friday</li>
+<li>from saturday to tuesday</li>
+<li>on fri</li>
+<li>on mon, wed and fri</li>
+<li>from mon to thu</li>
+<li>at 11:50</li>
+<li>at 23:50</li>
+<li>at 10:10 am</li>
+<li>at 10:10 pm</li>
+<li>on 19/5</li>
+<li>in september</li>
+<li>in sep</li>
+<li>from may to august</li>
+<li>from dec to feb</li>
+<li>in january and april</li>
+<li>in jan, aug, oct</li>
+</ul>
+
+<p>Repetition sentences can also be any logical mix of the above. For example:</p>
+
+<ul>
+<li>at 09:00 every 3 days</li>
+<li>from june to november every 2 hours</li>
+<li>every 30 minutes on fri and sat</li>
+<li>midnight every 2 days from monday to friday in october and december</li>
+</ul>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
