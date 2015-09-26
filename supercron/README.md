@@ -24,21 +24,51 @@ In non-interactive mode, at least one of the following options/arguments has to 
 Additionally, one of the following subcommands can be used: add, delete, enable, disable, search, clear.
 
 ***Subcommand add***
-- option `-h` or `--help`: shows the help message
+- option `-h` or `--help`: shows the help message of the subcommand
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
 - option `-c` or `--command`: required; here goes the command to be executed
 - option `-r` or `--repetition`: required; the repetition sentence (see examples below)
 - argument `name`: required; represents the job name which will be added
 
 ***Subcommands delete, enable and disable***
-- option `-h` or `--help`: shows the help message
+- option `-h` or `--help`: shows the help message of the subcommand
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
 - argument `name`: required; represents the job name on which the action will occur
 
 ***Subcommand search***
-- option `-h` or `--help`: shows the help message
+- option `-h` or `--help`: shows the help message of the subcommand
 - argument `name`: required; the exact job name to search for, or `@supercron` to list all SuperCron jobs, or `@all` to list all user's crontab entries
 
 ***Subcommand clear***
-It will clear only SuperCron jobs from user's crontab:
-- option `-h` or `--help`: shows the help message
+
+It will only clear SuperCron jobs from user's crontab:
+- option `-h` or `--help`: shows the help message of the subcommand
+
+## Examples
+- Adding a job:
+```
+supercron add -c "date +%j >> log_file" -r "every 2 days" log_dates
+supercron add -c "scp /path/to/local/file user@server:/path" -r "at 11:50 pm on mondays" backup_server
+```
+- Delete a job:
+```
+supercron delete log_dates
+```
+- Enable a job:
+```
+supercron enable log_dates
+```
+- Disable a job:
+```
+supercron disable log_dates
+```
+- Search jobs:
+```
+supercron search log_dates
+supercron search @supercron
+supercron search @all
+```
+- Clear all jobs:
+```
+supercron clear
+```
