@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Utils:
 	"""class that contains different utilities functions"""
 
@@ -43,3 +45,11 @@ class Utils:
 		hour = datetime.now().hour
 		minute = datetime.now().minute
 		return hour, minute
+
+	@staticmethod
+	def list_to_dict(name, command="", repetition=""):
+		args_dict = {}
+		args_dict['name'] = name
+		args_dict['command'] = [command]
+		args_dict['repetition'] = [repetition]
+		return args_dict

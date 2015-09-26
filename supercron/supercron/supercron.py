@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-import re
 import argparse
-from datetime import datetime
 
 from crontab import CronTab
 
