@@ -5,6 +5,7 @@ class Utils:
 	"""class that contains different utilities functions"""
 
 	DEBUG = True
+	FORBIDDEN_NAMES = ("@all", "@supercron")
 
 	DAYS = {
 		"sunday": "0",
@@ -60,3 +61,8 @@ class Utils:
 		p = Popen(["crontab", "-l"], stdout=PIPE, stderr=PIPE)
 		crontab_out, crontab_err = p.communicate()
 		return crontab_out
+
+	@staticmethod
+	def check_job_name(name):
+		if name not in Utils.FORBIDDEN_NAMES:
+			return True

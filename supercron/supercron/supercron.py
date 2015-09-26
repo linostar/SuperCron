@@ -108,6 +108,9 @@ class SuperCron:
 	def add_job(args):
 		"""add the job to crontab"""
 		name = args.name
+		if not Utils.check_job_name(name):
+			Utils.debug_print("Error: job name cannot be '{}'.".format(name))
+			sys.exit(1)
 		command = args.command[0]
 		repetition = args.repetition[0]
 		repeat = Repetition.parse_repetition(str(repetition))
@@ -167,7 +170,7 @@ class SuperCron:
 		if confirmed:
 			SuperCron._generic_clear_jobs(args)
 			return
-		confirm_clear = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
+		confirm_clear = raw_input("Are you sure you want to clear all of your SuperCron jobs? [y/n]: ")
 		if confirm_clear == "y":
 			SuperCron._generic_clear_jobs(args)
 		else:
