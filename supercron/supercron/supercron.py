@@ -70,45 +70,77 @@ class SuperCron:
 				"\n\tDisable a job:\tsupercron --disable log_dates" +
 				"\n\tSearch jobs:\tsupercron --search log_dates" +
 				"\n\tClear all jobs:\tsupercron clear")
-			parser.add_argument("-r", "--repetition", nargs=1,
-				help="repetition clause (should be enclosed by quotes if it contains spaces)")
-			parser.add_argument("-c", "--command", nargs=1,
-				help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
-			parser.add_argument("-d", "--delete", action="store_true", help="for deleteing a job")
-			parser.add_argument("--enable", action="store_true", help="for enabling a job")
-			parser.add_argument("--disable", action="store_true", help="for disabling a job")
-			parser.add_argument("--search", action="store_true", help="searches for a job by name")
 			parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
 				SuperCron.VERSION), help="display version number and exit")
-			parser.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
-			parser.add_argument("name", help="name of the job")
+			# Add subparsers
+			subparsers = parser.add_subparsers(title="Subcommands", help="Subcommand help")
+			parser_add = subparsers.add_parser("add", help="for adding a job",
+				description="For adding a job to user's crontab.")
+			parser_delete = subparsers.add_parser("delete", help="for deleting a job",
+				description="For deleting a SuperCron job from user's crontab.")
+			parser_enable = subparsers.add_parser("enable", help="for enabling a job",
+				description="For enabling a SuperCron job in user's crontab.")
+			parser_disable = subparsers.add_parser("disable", help="for disabling a job",
+				description="For disabling a SuperCron job in user's crontab.")
+			parser_search = subparsers.add_parser("search", help="for searching for a job by name",
+				formatter_class=argparse.RawDescriptionHelpFormatter,
+				description="For listing SuperCron jobs that match the exact name supplied.\n" +
+				"Special cases of the value of 'name':\n" +
+				"- '@supercon' (without quotes): list all SuperCron jobs in user's crontab\n" +
+				"- '@all' (without quotes): list all user's crontab entries")
+			parser_clear = subparsers.add_parser("clear", help="for clearing all SuperCron's jobs",
+				description="For clearing all SuperCron jobs from user's crontab.")
+			# subcommand 'add' arguments
+			parser_add.add_argument("-r", "--repetition", nargs=1, required=True,
+				help="repetition clause (should be enclosed by quotes if it contains spaces)")
+			parser_add.add_argument("-c", "--command", nargs=1, required=True,
+				help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
+			parser_add.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+			parser_add.add_argument("name", help="name of the job")
+			# subcommand 'delete' arguments
+			parser_delete.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+			parser_delete.add_argument("name", help="name of the job")
+			# subcommand 'enable' arguments
+			parser_enable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+			parser_enable.add_argument("name", help="name of the job")
+			# subcommand 'disable' arguments
+			parser_disable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+			parser_disable.add_argument("name", help="name of the job")
+			# subcommand 'search' arguments
+			parser_search.add_argument("name", help="name of the job")
+			# parse all args
 			args = parser.parse_args()
-			if args.quiet:
-				SuperCron.DEBUG = False
-			if args.delete:
-				if not SuperCron.check_other_args("delete", args):
-					raise CantUseOptWithOthers
-				SuperCron.delete_job(args.name)
-				sys.exit(0)
-			if args.enable:
-				if not SuperCron.check_other_args("enable", args):
-					raise CantUseOptWithOthers
-				SuperCron.enable_job(args.name, True)
-				sys.exit(0)
-			if args.disable:
-				if not SuperCron.check_other_args("disable", args):
-					raise CantUseOptWithOthers
-				SuperCron.enable_job(args.name, False)
-				sys.exit(0)
-			if args.search:
-				if not SuperCron.check_other_args("search", args):
-					raise CantUseOptWithOthers
-				SuperCron.search_job(args.name)
-				sys.exit(0)
-			if args.repetition and args.command:
-				return args.name, args.command, args.repetition
-			else:
-				raise NotEnoughArguments
+			print(args)
+			if "add" in args:
+				pass
+			elif "clear" in args:
+				print("hello")
+			# if args.quiet:
+			# 	SuperCron.DEBUG = False
+			# if args.delete:
+			# 	if not SuperCron.check_other_args("delete", args):
+			# 		raise CantUseOptWithOthers
+			# 	SuperCron.delete_job(args.name)
+			# 	sys.exit(0)
+			# if args.enable:
+			# 	if not SuperCron.check_other_args("enable", args):
+			# 		raise CantUseOptWithOthers
+			# 	SuperCron.enable_job(args.name, True)
+			# 	sys.exit(0)
+			# if args.disable:
+			# 	if not SuperCron.check_other_args("disable", args):
+			# 		raise CantUseOptWithOthers
+			# 	SuperCron.enable_job(args.name, False)
+			# 	sys.exit(0)
+			# if args.search:
+			# 	if not SuperCron.check_other_args("search", args):
+			# 		raise CantUseOptWithOthers
+			# 	SuperCron.search_job(args.name)
+			# 	sys.exit(0)
+			# if args.repetition and args.command:
+			# 	return args.name, args.command, args.repetition
+			# else:
+			# 	raise NotEnoughArguments
 		except CantUseOptWithOthers:
 			SuperCron.debug_print("Options '--delete', '--disable' and '--enable' cannot be used with any other options.")
 			sys.exit(1)
@@ -458,11 +490,9 @@ class SuperCron:
 def main():
 	if len(sys.argv) == 1:
 		SuperCron.interactive_mode()
-	elif len(sys.argv) == 2 and sys.argv[1] == "clear":
-		SuperCron.clear_jobs()
 	else:
-		name, command, repetition = SuperCron.parse_arguments()
-		SuperCron.add_job(name, command[0], repetition[0])
+		SuperCron.parse_arguments()
+		#SuperCron.add_job(name, command[0], repetition[0])
 	sys.exit(0)
 
 if __name__ == "__main__":
