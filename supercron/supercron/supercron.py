@@ -78,7 +78,7 @@ class SuperCron:
 		args.func(args)
 
 	@staticmethod
-	def generic_enable_job(name, enable_it):
+	def _generic_enable_job(name, enable_it):
 		"""enable or disable job(s) by their name"""
 		count = 0
 		cron = CronTab(user=True)
@@ -98,11 +98,11 @@ class SuperCron:
 
 	@staticmethod
 	def enable_job(args):
-		SuperCron.generic_enable_job(args.name, True)
+		SuperCron._generic_enable_job(args.name, True)
 
 	@staticmethod
 	def disable_job(args):
-		SuperCron.generic_enable_job(args.name, False)
+		SuperCron._generic_enable_job(args.name, False)
 
 	@staticmethod
 	def add_job(args):
@@ -162,24 +162,31 @@ class SuperCron:
 			Utils.debug_print("{} jobs named '{}' have been deleted.".format(count, name))
 
 	@staticmethod
-	def clear_jobs(args):
+	def clear_jobs(args, confirmed=False):
 		Utils.debug_print("Note: this will not affect crontab entries not added by SuperCron.")
+		if confirmed:
+			SuperCron._generic_clear_jobs(args)
+			return
 		confirm_clear = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
 		if confirm_clear == "y":
-			count = 0
-			cron = CronTab(user=True)
-			for job in cron:
-				if job.comment.startswith(SuperCron.PREFIX):
-					job.comment = SuperCron.TOBEDELETED
-					count += 1
-			cron.remove_all(comment=SuperCron.TOBEDELETED)
-			cron.write_to_user(user=True)
-			if count == 1:
-				Utils.debug_print("1 job has been removed from your crontab.")
-			else:
-				Utils.debug_print("{} jobs have been removed from your crontab.".format(count))
+			SuperCron._generic_clear_jobs(args)
 		else:
 			Utils.debug_print("Cancelled.")
+
+	@staticmethod
+	def _generic_clear_jobs(args):
+		count = 0
+		cron = CronTab(user=True)
+		for job in cron:
+			if job.comment.startswith(SuperCron.PREFIX):
+				job.comment = SuperCron.TOBEDELETED
+				count += 1
+		cron.remove_all(comment=SuperCron.TOBEDELETED)
+		cron.write_to_user(user=True)
+		if count == 1:
+			Utils.debug_print("1 job has been removed from your crontab.")
+		else:
+			Utils.debug_print("{} jobs have been removed from your crontab.".format(count))
 
 	@staticmethod
 	def search_job(args):

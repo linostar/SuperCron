@@ -235,6 +235,14 @@ class TestJobs(unittest.TestCase):
 		args = Namespace(Utils.list_to_dict("pwd"))
 		SuperCron.enable_job(args)
 
+	def test_delete_job(self):
+		args = Namespace(Utils.list_to_dict("pwd"))
+		SuperCron.delete_job(args)
+
+	def test_clear_jobs(self):
+		args = Namespace()
+		SuperCron.clear_jobs(args, True)
+
 
 if __name__ == "__main__":
 	unittest.main()
