@@ -1,0 +1,45 @@
+class Utils:
+	"""class that contains different utilities functions"""
+
+	DEBUG = True
+
+	DAYS = {
+		"sunday": "0",
+		"monday": "1",
+		"tuesday": "2",
+		"wednesday": "3",
+		"thursday": "4",
+		"friday": "5",
+		"saturday": "6"
+	}
+
+	MONTHS = {
+		"january": "1",
+		"february": "2",
+		"march": "3",
+		"april": "4",
+		"may": "5",
+		"june": "6",
+		"july": "7",
+		"august": "8",
+		"september": "9",
+		"october": "10",
+		"november": "11",
+		"december": "12"
+	}
+
+	SHORT_DAYS = {key[:3]:key for key in DAYS.keys()}
+
+	SHORT_MONTHS = {key[:3]:key for key in MONTHS.keys()}
+
+	@staticmethod
+	def debug_print(string, force_print=False):
+		if Utils.DEBUG or force_print:
+			print(string)
+
+	@staticmethod
+	def get_time_now():
+		"""get current time"""
+		hour = datetime.now().hour
+		minute = datetime.now().minute
+		return hour, minute

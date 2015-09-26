@@ -10,13 +10,14 @@ ROOT_DIR = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(ROOT_DIR)
 
 from supercron.supercron import SuperCron
+from supercron.utils import Utils
 
 
 class TestRepetitions(unittest.TestCase):
 	"""class that tests supercron for repetition parsing"""
 
 	def setUp(self):
-		SuperCron.DEBUG = False
+		Utils.DEBUG = False
 
 	def tearDown(self):
 		SuperCron.delete_job("ls")
@@ -34,7 +35,7 @@ class TestRepetitions(unittest.TestCase):
 		self.assertTrue(entry1 in user_crontab or entry2 in user_crontab)
 
 	def test_everyday(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * * * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "everyday")
 		user_crontab = self.get_crontab()
@@ -53,14 +54,14 @@ class TestRepetitions(unittest.TestCase):
 		self.assertTrue(entry in user_crontab)
 
 	def test_every_x_hours(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} */2 * * * ls # SuperCron__ls".format(minute).encode()
 		SuperCron.add_job("ls", "ls", "once every 2 hours")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_every_x_days(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} */11 * * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "once every 11 days")
 		user_crontab = self.get_crontab()
@@ -79,7 +80,7 @@ class TestRepetitions(unittest.TestCase):
 		self.assertTrue(entry in user_crontab)
 
 	def test_day_month(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} 22 7 * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "on 22/7")
 		user_crontab = self.get_crontab()
@@ -92,70 +93,70 @@ class TestRepetitions(unittest.TestCase):
 		self.assertTrue(entry in user_crontab)
 
 	def test_weekdays_single(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * * 2 ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "on tuesdays")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_weekdays_multiple_non_consecutive(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * * 1,3,5 ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "on mondays, wednesdays and fridays")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_weekdays_multiple_forward(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * * 1-4 ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from monday to thursday")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_weekdays_multiple_backward(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * * 0,1,5,6 ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from friday to monday")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_short_weekdays(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * * 0,1,5,6 ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from fri to mon")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_months_single(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * 5 * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "in May")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_months_multiple_non_consecutive(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * 2,5,9 * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "in May and September and February")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_months_multiple_forward(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * 6-8 * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from June to August")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_months_multiple_backward(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * 1,10,11,12 * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from October to January")
 		user_crontab = self.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
 	def test_short_months(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} {} * 1,10,11,12 * ls # SuperCron__ls".format(minute, hour).encode()
 		SuperCron.add_job("ls", "ls", "from oct to jan")
 		user_crontab = self.get_crontab()
@@ -174,7 +175,7 @@ class TestRepetitions(unittest.TestCase):
 		self.assertTrue(entry in user_crontab)
 
 	def test_mixed_month_weekday_every_x_hours(self):
-		hour, minute = SuperCron.get_time_now()
+		hour, minute = Utils.get_time_now()
 		entry = "{} */4 * 4 6 ls # SuperCron__ls".format(minute).encode()
 		SuperCron.add_job("ls", "ls", "every 4 hours on saturdays in april")
 		user_crontab = self.get_crontab()
