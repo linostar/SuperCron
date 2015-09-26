@@ -97,24 +97,32 @@ class SuperCron:
 				help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
 			parser_add.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 			parser_add.add_argument("name", help="name of the job")
+			parser_add.set_defaults(func=SuperCron.add_job)
 			# subcommand 'delete' arguments
 			parser_delete.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 			parser_delete.add_argument("name", help="name of the job")
+			parser_delete.set_defaults(func=SuperCron.delete_job)
 			# subcommand 'enable' arguments
 			parser_enable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 			parser_enable.add_argument("name", help="name of the job")
+			parser_enable.set_defaults(func=SuperCron.enable_job)
 			# subcommand 'disable' arguments
 			parser_disable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 			parser_disable.add_argument("name", help="name of the job")
+			parser_disable.set_defaults(func=SuperCron.disable_job)
 			# subcommand 'search' arguments
 			parser_search.add_argument("name", help="name of the job")
+			parser_search.set_defaults(func=SuperCron.search_job)
+			# subcommand 'clear' arguments
+			parser_clear.set_defaults(func=SuperCron.clear_jobs)
 			# parse all args
 			args = parser.parse_args()
-			print(args)
-			if "add" in args:
-				pass
-			elif "clear" in args:
-				print("hello")
+			args.func(args)
+			# print(args)
+			# if "add" in args:
+			# 	pass
+			# elif "clear" in args:
+			# 	print("hello")
 			# if args.quiet:
 			# 	SuperCron.DEBUG = False
 			# if args.delete:
@@ -148,13 +156,13 @@ class SuperCron:
 			SuperCron.debug_print("Error: not enough (or invalid) arguments. Type 'supercron --help' for help.")
 			sys.exit(1)
 
-	@staticmethod
-	def check_other_args(wanted, args):
-		"""check that mutual exclusive options are alone"""
-		for arg in args.__dict__:
-			if arg != wanted and arg != "name" and arg != "quiet" and args.__dict__[arg]:
-				return False
-		return True
+	# @staticmethod
+	# def check_other_args(wanted, args):
+	# 	"""check that mutual exclusive options are alone"""
+	# 	for arg in args.__dict__:
+	# 		if arg != wanted and arg != "name" and arg != "quiet" and args.__dict__[arg]:
+	# 			return False
+	# 	return True
 
 	@staticmethod
 	def get_time_now():
@@ -164,7 +172,7 @@ class SuperCron:
 		return hour, minute
 
 	@staticmethod
-	def enable_job(name, enable_it):
+	def generic_enable_job(name, enable_it):
 		"""enable or disable job(s) by their name"""
 		count = 0
 		cron = CronTab(user=True)
@@ -183,9 +191,20 @@ class SuperCron:
 			SuperCron.debug_print("{} jobs named '{}' have been {}.".format(count, name, action))
 
 	@staticmethod
-	def add_job(name, command, repeat):
+	def enable_job(args):
+		SuperCron.generic_enable_job(args.name, True)
+
+	@staticmethod
+	def disable_job(args):
+		SuperCron.generic_enable_job(args.name, False)
+
+	@staticmethod
+	def add_job(args):
 		"""add the job to crontab"""
-		repeat = SuperCron.parse_repetition(str(repeat))
+		name = args.name
+		command = args.command[0]
+		repetition = args.repetition[0]
+		repeat = SuperCron.parse_repetition(str(repetition))
 		if not repeat:
 			SuperCron.debug_print("Error: invalid repetition clause.")
 			sys.exit(1)
@@ -221,8 +240,9 @@ class SuperCron:
 		SuperCron.debug_print("Jobs named '{}' have been successfully added.".format(name))
 
 	@staticmethod
-	def delete_job(name):
+	def delete_job(args):
 		"""delete the specified job from user's crontab"""
+		name = args.name
 		count = 0
 		cron = CronTab(user=True)
 		for job in cron:
@@ -401,7 +421,7 @@ class SuperCron:
 		return repeat
 
 	@staticmethod
-	def clear_jobs():
+	def clear_jobs(args):
 		SuperCron.debug_print("Note: this will not affect crontab entries not added by SuperCron.")
 		confirm_clear = raw_input("Are you sure you want to clear all your SuperCron jobs? [y/n]: ")
 		if confirm_clear == "y":
@@ -421,8 +441,9 @@ class SuperCron:
 			SuperCron.debug_print("Cancelled.")
 
 	@staticmethod
-	def search_job(name):
+	def search_job(args):
 		"""That moment when you have to rely on a function to look for a job"""
+		name = args.name
 		job_list = []
 		cron = CronTab(user=True)
 		if name == "@all":
@@ -478,10 +499,10 @@ class SuperCron:
 			SuperCron.delete_job(name)
 		elif action == "enable":
 			SuperCron.debug_print("")
-			SuperCron.enable_job(name, True)
+			SuperCron.enable_job(name)
 		elif action == "disable":
 			SuperCron.debug_print("")
-			SuperCron.enable_job(name, False)
+			SuperCron.disable_job(name)
 		elif action == "search":
 			SuperCron.debug_print("")
 			SuperCron.search_job(name)
