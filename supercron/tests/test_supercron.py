@@ -19,7 +19,7 @@ class TestRepetitions(unittest.TestCase):
 		Utils.DEBUG = False
 
 	def tearDown(self):
-		args = Namespace(Utils.list_to_dict("ls"))
+		args = Namespace(Utils.list_to_dict("TEST__ls"))
 		SuperCron.delete_job(args)
 
 	def test_midnight(self):
@@ -213,7 +213,7 @@ class TestJobs(unittest.TestCase):
 
 	def setUp(self):
 		Utils.DEBUG = False
-		args = Namespace(Utils.list_to_dict("TEST__pwd", "pwd", "midnight"))
+		args = Namespace(Utils.list_to_dict("TEST__pwd", "pwd", "10:10"))
 		SuperCron.add_job(args)
 
 	def tearDown(self):
@@ -221,20 +221,32 @@ class TestJobs(unittest.TestCase):
 		SuperCron.delete_job(args)
 
 	def test_disable_job(self):
+		entry = b"# 10 10 * * * pwd # SuperCron__TEST__pwd"
 		args = Namespace(Utils.list_to_dict("TEST__pwd"))
 		SuperCron.disable_job(args)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry in user_crontab)
 
 	def test_enable_job(self):
+		entry = b"10 10 * * * pwd # SuperCron__TEST__pwd"
 		args = Namespace(Utils.list_to_dict("TEST__pwd"))
 		SuperCron.enable_job(args)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry in user_crontab)
 
 	def test_delete_job(self):
+		entry = b"10 10 * * * pwd # SuperCron__TEST__pwd"
 		args = Namespace(Utils.list_to_dict("TEST__pwd"))
 		SuperCron.delete_job(args)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry not in user_crontab)
 
 	def test_clear_jobs(self):
+		entry = b"10 10 * * * pwd # SuperCron__TEST__pwd"
 		args = Namespace()
 		SuperCron.clear_jobs(args, True)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry not in user_crontab)
 
 
 if __name__ == "__main__":
