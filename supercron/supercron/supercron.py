@@ -77,7 +77,7 @@ class SuperCron:
 			parser.add_argument("-d", "--delete", action="store_true", help="for deleteing a job")
 			parser.add_argument("--enable", action="store_true", help="for enabling a job")
 			parser.add_argument("--disable", action="store_true", help="for disabling a job")
-			parser.add_argument("--search", action="store_true", help="searches for a job by name, command or repetition")
+			parser.add_argument("--search", action="store_true", help="searches for a job by name")
 			parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
 				SuperCron.VERSION), help="display version number and exit")
 			parser.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
