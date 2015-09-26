@@ -16,6 +16,37 @@ class CantUseOptWithOthers(Exception):
 	pass
 
 
+class Namespace(dict):
+	"""A dict subclass that exposes its items as attributes.
+
+	Warning: Namespace instances do not have direct access to the
+	dict methods.
+
+	"""
+
+	def __init__(self, obj={}):
+		super(Namespace, self).__init__(obj)
+
+	def __dir__(self):
+		return tuple(self)
+
+	def __repr__(self):
+		return "%s(%s)" % (type(self).__name__, super().__repr__())
+
+	def __getattribute__(self, name):
+		try:
+			return self[name]
+		except KeyError:
+			msg = "'%s' object has no attribute '%s'"
+			raise AttributeError(msg % (type(self).__name__, name))
+
+	def __setattr__(self, name, value):
+		self[name] = value
+
+	def __delattr__(self, name):
+		del self[name]
+		
+
 class SuperCron:
 	"""Main SuperCron class"""
 
@@ -484,28 +515,29 @@ class SuperCron:
 		if action not in action_list:
 			SuperCron.debug_print("Error: action '{}' not recognized.".format(action))
 			sys.exit(1)
+		args = Namespace()
 		if action == "clear":
 			SuperCron.debug_print("")
-			SuperCron.clear_jobs()
+			SuperCron.clear_jobs(args)
 			return
-		name = raw_input("Job name: ")
+		args.name = raw_input("Job name: ")
 		if action == "add":
-			command = raw_input("Command to be executed: ")
-			repetition = raw_input("Repetition sentence: ")
+			args.command = [raw_input("Command to be executed: ")]
+			args.repetition = [raw_input("Repetition sentence: ")]
 			SuperCron.debug_print("")
-			SuperCron.add_job(name, command, repetition)
+			SuperCron.add_job(args)
 		elif action == "delete":
 			SuperCron.debug_print("")
-			SuperCron.delete_job(name)
+			SuperCron.delete_job(args)
 		elif action == "enable":
 			SuperCron.debug_print("")
-			SuperCron.enable_job(name)
+			SuperCron.enable_job(args)
 		elif action == "disable":
 			SuperCron.debug_print("")
-			SuperCron.disable_job(name)
+			SuperCron.disable_job(args)
 		elif action == "search":
 			SuperCron.debug_print("")
-			SuperCron.search_job(name)
+			SuperCron.search_job(args)
 
 
 def main():
