@@ -13,7 +13,7 @@ from repetition_parsing import Repetition
 class SuperCron:
 	"""Main SuperCron class"""
 
-	VERSION = 0.2
+	VERSION = "0.2.0"
 	PREFIX = "SuperCron__"
 	TOBEDELETED = PREFIX + "TOBEDELETED"
 
@@ -22,11 +22,11 @@ class SuperCron:
 		"""parse the arguments coming from running the script"""
 		parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
 			description="A utility that translates intelligent schedule commands to crontab entries.",
-			epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j\" -r \"every 2 hours\" log_dates" +
-			"\n\tDelete a job:\tsupercron -d log_dates" +
-			"\n\tEnable a job:\tsupercron --enable log_dates" +
-			"\n\tDisable a job:\tsupercron --disable log_dates" +
-			"\n\tSearch jobs:\tsupercron --search log_dates" +
+			epilog="Examples:\n\tAdd a job:\tsupercron add -c \"date +%j\" -r \"every 2 days\" log_dates" +
+			"\n\tDelete a job:\tsupercron delete log_dates" +
+			"\n\tEnable a job:\tsupercron enable log_dates" +
+			"\n\tDisable a job:\tsupercron disable log_dates" +
+			"\n\tSearch jobs:\tsupercron search log_dates" +
 			"\n\tClear all jobs:\tsupercron clear")
 		parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
 			SuperCron.VERSION), help="display version number and exit")
@@ -44,8 +44,8 @@ class SuperCron:
 			formatter_class=argparse.RawDescriptionHelpFormatter,
 			description="For listing SuperCron jobs that match the exact name supplied.\n" +
 			"Special cases of the value of 'name':\n" +
-			"- '@supercon' (without quotes): list all SuperCron jobs in user's crontab\n" +
-			"- '@all' (without quotes): list all user's crontab entries")
+			"  - '@supercon' (without quotes): list all SuperCron jobs in user's crontab\n" +
+			"  - '@all' (without quotes): list all user's crontab entries")
 		parser_clear = subparsers.add_parser("clear", help="for clearing all SuperCron's jobs",
 			description="For clearing all SuperCron jobs from user's crontab.")
 		# subcommand 'add' arguments

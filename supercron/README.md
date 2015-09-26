@@ -16,9 +16,29 @@ Run `supercron` without any arguments to start interactive mode. You will prompt
 
 **Non-interactive mode:**
 
-In non-interactive mode, at least one of the following options/arguments has to be used after the command name `sueprcron`:
+In non-interactive mode, at least one of the following options/arguments has to be used after the command name `supercron`.
 
-- option `-h` or `--help`: shows the full help message, with some usage examples
+- option `-h` or `--help`: shows the help message, with some usage examples
 - option `-V` or `--version`: displays the version number
-- option `-q` or `--quiet`: suppresses all output and error messages
-- argument `name`: required unless `--help`/`-h` or `--version`/`-V` options are used; it represents the job name on which the action will occur
+
+Additionally, one of the following subcommands can be used: add, delete, enable, disable, search, clear.
+
+***Subcommand add***
+- option `-h` or `--help`: shows the help message
+- option `-q` or `--quiet`: optional; suppresses all output and error messages
+- option `-c` or `--command`: required; here goes the command to be executed
+- option `-r` or `--repetition`: required; the repetition sentence (see examples below)
+- argument `name`: required; represents the job name which will be added
+
+***Subcommands delete, enable and disable***
+- option `-h` or `--help`: shows the help message
+- option `-q` or `--quiet`: optional; suppresses all output and error messages
+- argument `name`: required; represents the job name on which the action will occur
+
+***Subcommand search***
+- option `-h` or `--help`: shows the help message
+- argument `name`: required; the exact job name to search for, or `@supercron` to list all SuperCron jobs, or `@all` to list all user's crontab entries
+
+***Subcommand clear***
+It will clear only SuperCron jobs from user's crontab:
+- option `-h` or `--help`: shows the help message
