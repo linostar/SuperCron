@@ -45,10 +45,10 @@ It will only clear SuperCron jobs from user's crontab:
 - option `-h` or `--help`: shows the help message of the subcommand
 
 ## Examples
-- Adding a job:
+- Add a job:
 ```
 supercron add -c "date +%j >> log_file" -r "every 2 days" log_dates
-supercron add -c "scp /path/to/local/file user@server:/path" -r "at 11:50 pm on mondays" backup_server
+supercron add -c "scp -r /path1 user@server:/path2" -r "at 11:50 pm on mondays" backup_server
 ```
 - Delete a job:
 ```
@@ -68,7 +68,40 @@ supercron search log_dates
 supercron search @supercron
 supercron search @all
 ```
-- Clear all jobs:
+- Clear all SuperCron jobs:
 ```
 supercron clear
 ```
+
+## Repetition sentences
+Repetition sentences are provided in a `supercron add` command directly after the `-r` or `--repetition` option.
+
+Examples of accepted repetition sentences (case insensitive):
+- everyday
+- at midnight
+- every 5 minutes
+- once every 2 hours
+- every 10 days
+- every 4 months
+- on mondays
+- on monday, wednesday and friday
+- from saturday to tuesday
+- on fri
+- on mon, wed and fri
+- from mon to thu
+- at 11:50
+- at 23:50
+- at 10:10 am
+- at 10:10 pm
+- on 19/5
+- in september
+- in sep
+- from may to august
+- from dec to feb
+- in january and april
+- in jan, aug, oct
+
+Repetition sentences can also be any logical mix of the above. For example:
+- at 09:00 every 2 days
+- from june to november every 2 hours
+- every 30 minutes on fri and sat
