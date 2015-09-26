@@ -8,14 +8,6 @@ from datetime import datetime
 from crontab import CronTab
 
 
-class NotEnoughArguments(Exception):
-	pass
-
-
-class CantUseOptWithOthers(Exception):
-	pass
-
-
 class Namespace(dict):
 	"""A dict subclass that exposes its items as attributes.
 
@@ -92,108 +84,62 @@ class SuperCron:
 	@staticmethod
 	def parse_arguments():
 		"""parse the arguments coming from running the script"""
-		try:
-			parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-				description="A utility that translates intelligent schedule commands to crontab entries.",
-				epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j\" -r \"every 2 hours\" log_dates" +
-				"\n\tDelete a job:\tsupercron -d log_dates" +
-				"\n\tEnable a job:\tsupercron --enable log_dates" +
-				"\n\tDisable a job:\tsupercron --disable log_dates" +
-				"\n\tSearch jobs:\tsupercron --search log_dates" +
-				"\n\tClear all jobs:\tsupercron clear")
-			parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
-				SuperCron.VERSION), help="display version number and exit")
-			# Add subparsers
-			subparsers = parser.add_subparsers(title="Subcommands", help="Subcommand help")
-			parser_add = subparsers.add_parser("add", help="for adding a job",
-				description="For adding a job to user's crontab.")
-			parser_delete = subparsers.add_parser("delete", help="for deleting a job",
-				description="For deleting a SuperCron job from user's crontab.")
-			parser_enable = subparsers.add_parser("enable", help="for enabling a job",
-				description="For enabling a SuperCron job in user's crontab.")
-			parser_disable = subparsers.add_parser("disable", help="for disabling a job",
-				description="For disabling a SuperCron job in user's crontab.")
-			parser_search = subparsers.add_parser("search", help="for searching for a job by name",
-				formatter_class=argparse.RawDescriptionHelpFormatter,
-				description="For listing SuperCron jobs that match the exact name supplied.\n" +
-				"Special cases of the value of 'name':\n" +
-				"- '@supercon' (without quotes): list all SuperCron jobs in user's crontab\n" +
-				"- '@all' (without quotes): list all user's crontab entries")
-			parser_clear = subparsers.add_parser("clear", help="for clearing all SuperCron's jobs",
-				description="For clearing all SuperCron jobs from user's crontab.")
-			# subcommand 'add' arguments
-			parser_add.add_argument("-r", "--repetition", nargs=1, required=True,
-				help="repetition clause (should be enclosed by quotes if it contains spaces)")
-			parser_add.add_argument("-c", "--command", nargs=1, required=True,
-				help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
-			parser_add.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
-			parser_add.add_argument("name", help="name of the job")
-			parser_add.set_defaults(func=SuperCron.add_job)
-			# subcommand 'delete' arguments
-			parser_delete.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
-			parser_delete.add_argument("name", help="name of the job")
-			parser_delete.set_defaults(func=SuperCron.delete_job)
-			# subcommand 'enable' arguments
-			parser_enable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
-			parser_enable.add_argument("name", help="name of the job")
-			parser_enable.set_defaults(func=SuperCron.enable_job)
-			# subcommand 'disable' arguments
-			parser_disable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
-			parser_disable.add_argument("name", help="name of the job")
-			parser_disable.set_defaults(func=SuperCron.disable_job)
-			# subcommand 'search' arguments
-			parser_search.add_argument("name", help="name of the job")
-			parser_search.set_defaults(func=SuperCron.search_job)
-			# subcommand 'clear' arguments
-			parser_clear.set_defaults(func=SuperCron.clear_jobs)
-			# parse all args
-			args = parser.parse_args()
-			args.func(args)
-			# print(args)
-			# if "add" in args:
-			# 	pass
-			# elif "clear" in args:
-			# 	print("hello")
-			# if args.quiet:
-			# 	SuperCron.DEBUG = False
-			# if args.delete:
-			# 	if not SuperCron.check_other_args("delete", args):
-			# 		raise CantUseOptWithOthers
-			# 	SuperCron.delete_job(args.name)
-			# 	sys.exit(0)
-			# if args.enable:
-			# 	if not SuperCron.check_other_args("enable", args):
-			# 		raise CantUseOptWithOthers
-			# 	SuperCron.enable_job(args.name, True)
-			# 	sys.exit(0)
-			# if args.disable:
-			# 	if not SuperCron.check_other_args("disable", args):
-			# 		raise CantUseOptWithOthers
-			# 	SuperCron.enable_job(args.name, False)
-			# 	sys.exit(0)
-			# if args.search:
-			# 	if not SuperCron.check_other_args("search", args):
-			# 		raise CantUseOptWithOthers
-			# 	SuperCron.search_job(args.name)
-			# 	sys.exit(0)
-			# if args.repetition and args.command:
-			# 	return args.name, args.command, args.repetition
-			# else:
-			# 	raise NotEnoughArguments
-		except CantUseOptWithOthers:
-			SuperCron.debug_print("Options '--delete', '--disable' and '--enable' cannot be used with any other options.")
-			sys.exit(1)
-		except NotEnoughArguments:
-			SuperCron.debug_print("Error: not enough (or invalid) arguments. Type 'supercron --help' for help.")
-			sys.exit(1)
-
-	# @staticmethod
-	# def check_other_args(wanted, args):
-	# 	"""check that mutual exclusive options are alone"""
-	# 	for arg in args.__dict__:
-	# 		if arg != wanted and arg != "name" and arg != "quiet" and args.__dict__[arg]:
-	# 			return False
-	# 	return True
+		parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+			description="A utility that translates intelligent schedule commands to crontab entries.",
+			epilog="Examples:\n\tAdd a job:\tsupercron -c \"date +%j\" -r \"every 2 hours\" log_dates" +
+			"\n\tDelete a job:\tsupercron -d log_dates" +
+			"\n\tEnable a job:\tsupercron --enable log_dates" +
+			"\n\tDisable a job:\tsupercron --disable log_dates" +
+			"\n\tSearch jobs:\tsupercron --search log_dates" +
+			"\n\tClear all jobs:\tsupercron clear")
+		parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
+			SuperCron.VERSION), help="display version number and exit")
+		# Add subparsers
+		subparsers = parser.add_subparsers(title="Subcommands", help="Subcommand help")
+		parser_add = subparsers.add_parser("add", help="for adding a job",
+			description="For adding a job to user's crontab.")
+		parser_delete = subparsers.add_parser("delete", help="for deleting a job",
+			description="For deleting a SuperCron job from user's crontab.")
+		parser_enable = subparsers.add_parser("enable", help="for enabling a job",
+			description="For enabling a SuperCron job in user's crontab.")
+		parser_disable = subparsers.add_parser("disable", help="for disabling a job",
+			description="For disabling a SuperCron job in user's crontab.")
+		parser_search = subparsers.add_parser("search", help="for searching for a job by name",
+			formatter_class=argparse.RawDescriptionHelpFormatter,
+			description="For listing SuperCron jobs that match the exact name supplied.\n" +
+			"Special cases of the value of 'name':\n" +
+			"- '@supercon' (without quotes): list all SuperCron jobs in user's crontab\n" +
+			"- '@all' (without quotes): list all user's crontab entries")
+		parser_clear = subparsers.add_parser("clear", help="for clearing all SuperCron's jobs",
+			description="For clearing all SuperCron jobs from user's crontab.")
+		# subcommand 'add' arguments
+		parser_add.add_argument("-r", "--repetition", nargs=1, required=True,
+			help="repetition clause (should be enclosed by quotes if it contains spaces)")
+		parser_add.add_argument("-c", "--command", nargs=1, required=True,
+			help="command to be executed by the job (should be enclosed by quotes if it contains spaces)")
+		parser_add.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+		parser_add.add_argument("name", help="name of the job")
+		parser_add.set_defaults(func=SuperCron.add_job)
+		# subcommand 'delete' arguments
+		parser_delete.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+		parser_delete.add_argument("name", help="name of the job")
+		parser_delete.set_defaults(func=SuperCron.delete_job)
+		# subcommand 'enable' arguments
+		parser_enable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+		parser_enable.add_argument("name", help="name of the job")
+		parser_enable.set_defaults(func=SuperCron.enable_job)
+		# subcommand 'disable' arguments
+		parser_disable.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+		parser_disable.add_argument("name", help="name of the job")
+		parser_disable.set_defaults(func=SuperCron.disable_job)
+		# subcommand 'search' arguments
+		parser_search.add_argument("name", help="name of the job")
+		parser_search.set_defaults(func=SuperCron.search_job)
+		# subcommand 'clear' arguments
+		parser_clear.set_defaults(func=SuperCron.clear_jobs)
+		# parse all args
+		args = parser.parse_args()
+		args.func(args)
 
 	@staticmethod
 	def get_time_now():
@@ -545,7 +491,6 @@ def main():
 		SuperCron.interactive_mode()
 	else:
 		SuperCron.parse_arguments()
-		#SuperCron.add_job(name, command[0], repetition[0])
 	sys.exit(0)
 
 if __name__ == "__main__":
