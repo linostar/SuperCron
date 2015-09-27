@@ -7,7 +7,7 @@ fp.close()
 setup(
 	name = 'supercron',
 	packages = ['supercron', 'tests'],
-	version = '0.2.1',
+	version = '0.2.2',
 	description ='Intelligent interface to cron in UNIX systems',
 	author = 'Anas El Husseini',
 	author_email = 'linux.anas@gmail.com',
