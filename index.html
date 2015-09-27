@@ -81,6 +81,15 @@
 <li>argument <code>name</code>: required; represents the job name which will be added (several jobs can share the same name)</li>
 </ul>
 
+<p><strong><em>Subcommand rename</em></strong></p>
+
+<ul>
+<li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
+<li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
+<li>argument <code>old_name</code>: required; old name of the job(s) (several jobs can share the same name)</li>
+<li>argument <code>new_name</code>: required; new name of the job(s) (several jobs can share the same name)</li>
+</ul>
+
 <p><strong><em>Subcommands delete, enable and disable</em></strong></p>
 
 <ul>
@@ -102,6 +111,7 @@
 
 <ul>
 <li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
+<li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
 <li>option <code>-f</code> or <code>--force</code>: skips asking for confirmation before clearing all jobs</li>
 </ul>
 
@@ -114,6 +124,13 @@
 
 <pre><code>supercron add -c "date +%j &gt;&gt; log_file" -r "every 2 days" log_dates
 supercron add -c "scp -r /path1 user@server:/path2" -r "at 11:50 pm on mondays" backup_server
+</code></pre>
+
+<ul>
+<li>Rename a job:</li>
+</ul>
+
+<pre><code>supercron rename log_dates log_all_dates
 </code></pre>
 
 <ul>
