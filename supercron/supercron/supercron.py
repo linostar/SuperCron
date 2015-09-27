@@ -28,6 +28,7 @@ class SuperCron:
 		parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
 			description="A utility that translates intelligent schedule commands to crontab entries.",
 			epilog="Examples:\n\tAdd a job:\tsupercron add -c \"date +%j\" -r \"every 2 days\" log_dates" +
+			"\n\tRename a job:\tsupercron rename log_dates log_all_dates" +
 			"\n\tDelete a job:\tsupercron delete log_dates" +
 			"\n\tEnable a job:\tsupercron enable log_dates" +
 			"\n\tDisable a job:\tsupercron disable log_dates" +
@@ -39,6 +40,8 @@ class SuperCron:
 		subparsers = parser.add_subparsers(title="Subcommands", help="Subcommand help")
 		parser_add = subparsers.add_parser("add", help="for adding a job",
 			description="For adding a job to user's crontab.")
+		parser_rename = subparsers.add_parser("rename", help="for renaming a job",
+			description="For renaming a SuperCron job in user's crontab.")
 		parser_delete = subparsers.add_parser("delete", help="for deleting a job",
 			description="For deleting a SuperCron job from user's crontab.")
 		parser_enable = subparsers.add_parser("enable", help="for enabling a job",
@@ -61,6 +64,11 @@ class SuperCron:
 		parser_add.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 		parser_add.add_argument("name", help="name of the job")
 		parser_add.set_defaults(func=SuperCron.add_job)
+		# subcommand 'rename' arguments
+		parser_rename.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+		parser_rename.add_argument("old_name", help="old name of the job")
+		parser_rename.add_argument("new_name", help="new name of the job")
+		parser_rename.set_defaults(func=SuperCron.rename_job)
 		# subcommand 'delete' arguments
 		parser_delete.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 		parser_delete.add_argument("name", help="name of the job")
@@ -89,7 +97,7 @@ class SuperCron:
 		count = 0
 		cron = CronTab(user=True)
 		for job in cron:
-			if job.comment == SuperCron.PREFIX + str(name) and job.is_enabled() != enable_it:
+			if job.comment == SuperCron.PREFIX + name and job.is_enabled() != enable_it:
 				job.enable(enable_it)
 				count += 1
 		if enable_it:
@@ -104,27 +112,28 @@ class SuperCron:
 
 	@staticmethod
 	def enable_job(args):
-		SuperCron._generic_enable_job(args.name, True)
+		SuperCron._generic_enable_job(str(args.name), True)
 
 	@staticmethod
 	def disable_job(args):
-		SuperCron._generic_enable_job(args.name, False)
+		SuperCron._generic_enable_job(str(args.name), False)
 
 	@staticmethod
 	def add_job(args):
 		"""add the job to crontab"""
-		name = args.name
+		name = str(args.name)
 		if not Utils.check_job_name(name):
 			Utils.debug_print("Error: job name cannot be '{}'.".format(name))
 			sys.exit(1)
-		command = args.command[0]
-		repetition = args.repetition[0]
-		repeat = Repetition.parse_repetition(str(repetition))
+		command = str(args.command[0])
+		repetition = str(args.repetition[0])
+		repeat = Repetition.parse_repetition(repetition)
 		if not repeat:
-			Utils.debug_print("Error: invalid repetition clause.")
+			Utils.debug_print("Error: invalid repetition sentence: '{}'."
+				.format(repetition))
 			sys.exit(1)
 		cron = CronTab(user=True)
-		job = cron.new(command=str(command), comment=SuperCron.PREFIX + str(name))
+		job = cron.new(command=command, comment=SuperCron.PREFIX + name)
 		if "reboot" in repeat:
 			job.every_reboot()
 		else:
@@ -155,13 +164,37 @@ class SuperCron:
 		Utils.debug_print("Jobs named '{}' have been successfully added.".format(name))
 
 	@staticmethod
+	def rename_job(args):
+		"""rename a job in user's crontab"""
+		count = 0
+		old_name = str(args.old_name)
+		new_name = str(args.new_name)
+		if not Utils.check_job_name(new_name):
+			Utils.debug_print("Error: job name cannot be '{}'.".format(name))
+			sys.exit(1)
+		cron = CronTab(user=True)
+		for job in cron:
+			if job.comment == SuperCron.PREFIX + old_name:
+				job.comment = SuperCron.PREFIX + new_name
+				count += 1
+		cron.write_to_user(user=True)
+		if count == 0:
+			Utils.debug_print("Error: job '{}' does not exist.".format(old_name))
+		elif count == 1:
+			Utils.debug_print("1 job has been renamed from '{}' to '{}'."
+				.format(old_name, new_name))
+		else:
+			Utils.debug_print("{} jobs have been renamed from '{}' to '{}'."
+				.format(count, old_name, new_name))
+
+	@staticmethod
 	def delete_job(args):
 		"""delete the specified job from user's crontab"""
-		name = args.name
+		name = str(args.name)
 		count = 0
 		cron = CronTab(user=True)
 		for job in cron:
-			if job.comment == SuperCron.PREFIX + str(name):
+			if job.comment == SuperCron.PREFIX + name:
 				cron.remove(job)
 				count += 1
 		cron.write_to_user(user=True)
@@ -202,7 +235,7 @@ class SuperCron:
 		"""That moment when you have to rely on a function to look for a job"""
 		try:
 			count = 0
-			name = args.name
+			name = str(args.name)
 			job_list = []
 			cron = CronTab(user=True)
 			if name == "@all":
@@ -220,10 +253,10 @@ class SuperCron:
 						enabled = "YES" if job.is_enabled() else "NO"
 						job_list.append([job_name, enabled, str(job.slices), job.command])
 			else:
-				jobs = cron.find_comment(SuperCron.PREFIX + str(name))
+				jobs = cron.find_comment(SuperCron.PREFIX + name)
 				for job in jobs:
 					enabled = "YES" if job.is_enabled() else "NO"
-					job_list.append([str(name), enabled, str(job.slices), job.command])
+					job_list.append([name, enabled, str(job.slices), job.command])
 			if job_list:
 				col_widths = []
 				col_titles = ["Name", "Enabled", "Repetition", "Command"]
@@ -244,10 +277,10 @@ class SuperCron:
 	@staticmethod
 	def interactive_mode():
 		try:
-			action_list = ("add", "delete", "enable", "disable", "search", "clear")
+			action_list = ("add", "rename", "delete", "enable", "disable", "search", "clear")
 			Utils.debug_print("SuperCron (interactive mode)")
 			Utils.debug_print("")
-			action = raw_input("Action [add/delete/enable/disable/search/clear]: ")
+			action = raw_input("Action [add/rename/delete/enable/disable/search/clear]: ")
 			action = str(action.lower().strip())
 			if action not in action_list:
 				Utils.debug_print("Error: action '{}' not recognized.".format(action))
@@ -256,6 +289,12 @@ class SuperCron:
 			if action == "clear":
 				Utils.debug_print("")
 				SuperCron.clear_jobs(args)
+				return
+			if action == "rename":
+				args.old_name = raw_input("Job old name: ")
+				args.new_name = raw_input("Job new name: ")
+				Utils.debug_print("")
+				SuperCron.rename_job(args)
 				return
 			args.name = raw_input("Job name: ")
 			if action == "add":
