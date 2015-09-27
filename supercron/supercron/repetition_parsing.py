@@ -1,6 +1,9 @@
 import re
 
-from utils import Utils
+try:
+	from utils import Utils
+except ImportError:
+	from supercron.utils import Utils
 
 class Repetition:
 	"""class for parsing repetition clauses"""

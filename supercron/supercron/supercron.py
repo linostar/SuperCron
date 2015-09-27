@@ -5,9 +5,14 @@ import argparse
 
 from crontab import CronTab
 
-from namespace import Namespace
-from utils import Utils
-from repetition_parsing import Repetition
+try:
+	from namespace import Namespace
+	from utils import Utils
+	from repetition_parsing import Repetition
+except ImportError:
+	from supercron.namespace import Namespace
+	from supercron.utils import Utils
+	from supercron.repetition_parsing import Repetition
 
 
 class SuperCron:
