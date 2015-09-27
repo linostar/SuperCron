@@ -210,25 +210,28 @@ class SuperCron:
 						job_name = job.comment[len(SuperCron.PREFIX):]
 					else:
 						job_name = job.comment
-					job_list.append([job_name, str(job.slices), job.command])
+					enabled = "YES" if job.is_enabled() else "NO"
+					job_list.append([job_name, enabled, str(job.slices), job.command])
 			elif name == "@supercron":
 				for job in cron:
 					if job.comment.startswith(SuperCron.PREFIX):
 						job_name = job.comment[len(SuperCron.PREFIX):]
-						job_list.append([job_name, str(job.slices), job.command])
+						enabled = "YES" if job.is_enabled() else "NO"
+						job_list.append([job_name, enabled, str(job.slices), job.command])
 			else:
 				jobs = cron.find_comment(SuperCron.PREFIX + str(name))
 				for job in jobs:
-					job_list.append([str(name), str(job.slices), job.command])
+					enabled = "YES" if job.is_enabled() else "NO"
+					job_list.append([str(name), enabled, str(job.slices), job.command])
 			if job_list:
 				col_widths = []
-				col_titles = ["Name", "Repetition", "Command"]
-				for i in range(0, 3):
+				col_titles = ["Name", "Enabled", "Repetition", "Command"]
+				for i in range(0, 4):
 					col_widths.append(max(max(len(n[i]) for n in job_list) + 2, len(col_titles[i]) + 2))
-				Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(col_titles, range(0, 3))))
+				Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(col_titles, range(0, 4))))
 				Utils.debug_print("-" * (sum(col_widths) - 2))
 				for job_item in job_list:
-					Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(job_item, range(0, 3))))
+					Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(job_item, range(0, 4))))
 					count += 1
 			else:
 				Utils.debug_print("Zero search results.")
