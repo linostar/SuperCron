@@ -102,6 +102,7 @@ Examples of accepted repetition sentences (case insensitive):
 - in jan, aug, oct
 
 Repetition sentences can also be any logical mix of the above. For example:
-- at 09:00 every 2 days
+- at 09:00 every 3 days
 - from june to november every 2 hours
 - every 30 minutes on fri and sat
+- midnight every 2 days from monday to friday in october and december
