@@ -85,6 +85,7 @@ class SuperCron:
 		parser_search.add_argument("name", help="name of the job")
 		parser_search.set_defaults(func=SuperCron.search_job)
 		# subcommand 'clear' arguments
+		parser_clear.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 		parser_clear.add_argument("-f", "--force", action="store_true", help="do not ask for confirmation before clearing")
 		parser_clear.set_defaults(func=SuperCron.clear_jobs)
 		# parse all args
@@ -92,8 +93,9 @@ class SuperCron:
 		args.func(args)
 
 	@staticmethod
-	def _generic_enable_job(name, enable_it):
+	def _generic_enable_job(name, enable_it, quiet):
 		"""enable or disable job(s) by their name"""
+		Utils.DEBUG = not quiet
 		count = 0
 		cron = CronTab(user=True)
 		for job in cron:
@@ -112,15 +114,16 @@ class SuperCron:
 
 	@staticmethod
 	def enable_job(args):
-		SuperCron._generic_enable_job(str(args.name), True)
+		SuperCron._generic_enable_job(str(args.name), True, args.quiet)
 
 	@staticmethod
 	def disable_job(args):
-		SuperCron._generic_enable_job(str(args.name), False)
+		SuperCron._generic_enable_job(str(args.name), False, args.quiet)
 
 	@staticmethod
 	def add_job(args):
 		"""add the job to crontab"""
+		Utils.DEBUG = not args.quiet
 		name = str(args.name)
 		if not Utils.check_job_name(name):
 			Utils.debug_print("Error: job name cannot be '{}'.".format(name))
@@ -166,6 +169,7 @@ class SuperCron:
 	@staticmethod
 	def rename_job(args):
 		"""rename a job in user's crontab"""
+		Utils.DEBUG = not args.quiet
 		count = 0
 		old_name = str(args.old_name)
 		new_name = str(args.new_name)
@@ -190,6 +194,7 @@ class SuperCron:
 	@staticmethod
 	def delete_job(args):
 		"""delete the specified job from user's crontab"""
+		Utils.DEBUG = not args.quiet
 		name = str(args.name)
 		count = 0
 		cron = CronTab(user=True)
@@ -205,18 +210,20 @@ class SuperCron:
 
 	@staticmethod
 	def clear_jobs(args):
+		Utils.DEBUG = not args.quiet
 		if "force" in args and args.force:
-			SuperCron._generic_clear_jobs(args)
+			SuperCron._generic_clear_jobs(args, args.quiet)
 			return
 		Utils.debug_print("Note: this will not affect crontab entries not added by SuperCron.")
 		confirm_clear = raw_input("Are you sure you want to clear all of your SuperCron jobs? [y/n]: ")
 		if confirm_clear == "y":
-			SuperCron._generic_clear_jobs(args)
+			SuperCron._generic_clear_jobs(args, args.quiet)
 		else:
 			Utils.debug_print("Cancelled.")
 
 	@staticmethod
-	def _generic_clear_jobs(args):
+	def _generic_clear_jobs(args, quiet):
+		Utils.DEBUG = not quiet
 		count = 0
 		cron = CronTab(user=True)
 		for job in cron:

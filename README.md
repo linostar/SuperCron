@@ -39,6 +39,12 @@ Additionally, one of the following subcommands can be used: add, delete, enable,
 - option `-r` or `--repetition`: required; the repetition sentence (see examples below)
 - argument `name`: required; represents the job name which will be added (several jobs can share the same name)
 
+***Subcommand rename***
+- option `-h` or `--help`: shows the help message of the subcommand
+- option `-q` or `--quiet`: optional; suppresses all output and error messages
+- argument `old_name`: required; old name of the job(s) (several jobs can share the same name)
+- argument `new_name`: required; new name of the job(s) (several jobs can share the same name)
+
 ***Subcommands delete, enable and disable***
 - option `-h` or `--help`: shows the help message of the subcommand
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
