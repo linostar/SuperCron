@@ -38,6 +38,12 @@ Additionally, one of the following subcommands can be used: add, delete, enable,
 - option `-r` or `--repetition`: required; the repetition sentence (see examples below)
 - argument `name`: required; represents the job name which will be added (several jobs can share the same name)
 
+***Subcommand rename***
+- option `-h` or `--help`: shows the help message of the subcommand
+- option `-q` or `--quiet`: optional; suppresses all output and error messages
+- argument `old_name`: required; old name of the job(s) (several jobs can share the same name)
+- argument `new_name`: required; new name of the job(s) (several jobs can share the same name)
+
 ***Subcommands delete, enable and disable***
 - option `-h` or `--help`: shows the help message of the subcommand
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
@@ -45,6 +51,7 @@ Additionally, one of the following subcommands can be used: add, delete, enable,
 
 ***Subcommand search***
 - option `-h` or `--help`: shows the help message of the subcommand
+- option `-q` or `--quiet`: optional; suppresses all output and error messages
 - argument `name`: required; the exact job name to search for, or `@supercron` to list all SuperCron jobs, or `@all` to list all user's crontab entries
 
 ***Subcommand clear***
@@ -58,6 +65,10 @@ It will only clear SuperCron jobs from user's crontab:
 ```
 supercron add -c "date +%j >> log_file" -r "every 2 days" log_dates
 supercron add -c "scp -r /path1 user@server:/path2" -r "at 11:50 pm on mondays" backup_server
+```
+- Rename a job:
+```
+supercron rename log_dates log_all_dates
 ```
 - Delete a job:
 ```

@@ -58,6 +58,7 @@ Additionally, one of the following subcommands can be used: add, delete, enable,
 
 It will only clear SuperCron jobs from user's crontab:
 - option `-h` or `--help`: shows the help message of the subcommand
+- option `-q` or `--quiet`: optional; suppresses all output and error messages
 - option `-f` or `--force`: skips asking for confirmation before clearing all jobs
 
 ## Examples
@@ -65,6 +66,10 @@ It will only clear SuperCron jobs from user's crontab:
 ```
 supercron add -c "date +%j >> log_file" -r "every 2 days" log_dates
 supercron add -c "scp -r /path1 user@server:/path2" -r "at 11:50 pm on mondays" backup_server
+```
+- Rename a job:
+```
+supercron rename log_dates log_all_dates
 ```
 - Delete a job:
 ```

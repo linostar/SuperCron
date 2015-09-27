@@ -8,7 +8,7 @@ class Namespace(dict):
 		return tuple(self)
 
 	def __repr__(self):
-		return "%s(%s)" % (type(self).__name__, super().__repr__())
+		return "%s(%s)" % (type(self).__name__, super(Namespace, self).__repr__())
 
 	def __getattribute__(self, name):
 		try:

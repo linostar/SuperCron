@@ -236,6 +236,17 @@ class TestJobs(unittest.TestCase):
 		user_crontab = Utils.get_crontab()
 		self.assertTrue(entry in user_crontab and dis_entry not in user_crontab)
 
+	def test_rename_job(self):
+		entry1 = b"10 10 * * * pwd # SuperCron__TEST__pwd"
+		entry2 = b"10 10 * * * pwd # SuperCron__TEST__ls"
+		args = Namespace({"old_name": "TEST__pwd", "new_name": "TEST__ls"})
+		SuperCron.rename_job(args)
+		user_crontab = Utils.get_crontab()
+		rename_check = entry1 not in user_crontab and entry2 in user_crontab
+		args = Namespace({"old_name": "TEST__ls", "new_name": "TEST__pwd"})
+		SuperCron.rename_job(args)
+		self.assertTrue(rename_check)
+
 	def test_delete_job(self):
 		entry = b"10 10 * * * pwd # SuperCron__TEST__pwd"
 		args = Namespace(Utils.list_to_dict("TEST__pwd"))
