@@ -39,6 +39,19 @@
 <p>Run <code>pip install supercron</code> or <code>easy_install supercron</code>.</p>
 
 <h2>
+<a id="supercron-vs-classical-crontab" class="anchor" href="#supercron-vs-classical-crontab" aria-hidden="true"><span class="octicon octicon-link"></span></a>SuperCron vs classical crontab</h2>
+
+<p>SuperCron is based on crontab, while providing the following additional advantages:</p>
+
+<ul>
+<li>it can run interactively or non-interactively.</li>
+<li>it allows controlling several jobs simultaneously if they were assigned the same job name.</li>
+<li>it provides more options to handle jobs: adding, removing, searching, enabling, disabling, etc.</li>
+<li>it allows a vast and flexible amount of repetition sentences.</li>
+<li>it is more friendly especially to new sysadmins.</li>
+</ul>
+
+<h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <p>SuperCron can run either in interactive mode or non-interactive mode.</p>
@@ -65,7 +78,7 @@
 <li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
 <li>option <code>-c</code> or <code>--command</code>: required; here goes the command to be executed</li>
 <li>option <code>-r</code> or <code>--repetition</code>: required; the repetition sentence (see examples below)</li>
-<li>argument <code>name</code>: required; represents the job name which will be added</li>
+<li>argument <code>name</code>: required; represents the job name which will be added (several jobs can share the same name)</li>
 </ul>
 
 <p><strong><em>Subcommands delete, enable and disable</em></strong></p>
@@ -73,7 +86,7 @@
 <ul>
 <li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
 <li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
-<li>argument <code>name</code>: required; represents the job name on which the action will occur</li>
+<li>argument <code>name</code>: required; represents the job name on which the action will occur (several jobs can share the same name)</li>
 </ul>
 
 <p><strong><em>Subcommand search</em></strong></p>
@@ -172,17 +185,27 @@ supercron search @all
 <li>in jan, aug, oct</li>
 </ul>
 
-<p>Repetition sentences can also be any logical mix of the above. For example:</p>
+<p>Repetition sentences can also be any (unsorted) logical mix of the above. For example:</p>
 
 <ul>
 <li>at 09:00 every 3 days</li>
 <li>from june to november every 2 hours</li>
 <li>every 30 minutes on fri and sat</li>
-<li>midnight every 2 days from monday to friday in october and december</li>
+<li>midnight from monday to friday in october and december</li>
 </ul>
       </section>
     </div>
 
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-65894507-2");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
