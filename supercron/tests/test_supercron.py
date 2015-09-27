@@ -245,8 +245,8 @@ class TestJobs(unittest.TestCase):
 
 	def test_clear_jobs(self):
 		entry = b"10 10 * * * pwd # SuperCron__TEST__pwd"
-		args = Namespace()
-		SuperCron.clear_jobs(args, True)
+		args = Namespace({"force": True})
+		SuperCron.clear_jobs(args)
 		user_crontab = Utils.get_crontab()
 		self.assertTrue(entry not in user_crontab)
 

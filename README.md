@@ -52,6 +52,7 @@ Additionally, one of the following subcommands can be used: add, delete, enable,
 
 It will only clear SuperCron jobs from user's crontab:
 - option `-h` or `--help`: shows the help message of the subcommand
+- option `-f` or `--force`: skips asking for confirmation before clearing all jobs
 
 ## Examples
 - Add a job:

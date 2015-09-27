@@ -77,6 +77,7 @@ class SuperCron:
 		parser_search.add_argument("name", help="name of the job")
 		parser_search.set_defaults(func=SuperCron.search_job)
 		# subcommand 'clear' arguments
+		parser_clear.add_argument("-f", "--force", action="store_true", help="do not ask for confirmation before clearing")
 		parser_clear.set_defaults(func=SuperCron.clear_jobs)
 		# parse all args
 		args = parser.parse_args()
@@ -170,11 +171,11 @@ class SuperCron:
 			Utils.debug_print("{} jobs named '{}' have been deleted.".format(count, name))
 
 	@staticmethod
-	def clear_jobs(args, confirmed=False):
-		Utils.debug_print("Note: this will not affect crontab entries not added by SuperCron.")
-		if confirmed:
+	def clear_jobs(args):
+		if "force" in args and args.force:
 			SuperCron._generic_clear_jobs(args)
 			return
+		Utils.debug_print("Note: this will not affect crontab entries not added by SuperCron.")
 		confirm_clear = raw_input("Are you sure you want to clear all of your SuperCron jobs? [y/n]: ")
 		if confirm_clear == "y":
 			SuperCron._generic_clear_jobs(args)
