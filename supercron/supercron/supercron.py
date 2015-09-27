@@ -243,37 +243,40 @@ class SuperCron:
 
 	@staticmethod
 	def interactive_mode():
-		action_list = ("add", "delete", "enable", "disable", "search", "clear")
-		Utils.debug_print("SuperCron (interactive mode)")
-		Utils.debug_print("")
-		action = raw_input("Action [add/delete/enable/disable/search/clear]: ")
-		action = str(action.lower().strip())
-		if action not in action_list:
-			Utils.debug_print("Error: action '{}' not recognized.".format(action))
-			sys.exit(1)
-		args = Namespace()
-		if action == "clear":
+		try:
+			action_list = ("add", "delete", "enable", "disable", "search", "clear")
+			Utils.debug_print("SuperCron (interactive mode)")
 			Utils.debug_print("")
-			SuperCron.clear_jobs(args)
-			return
-		args.name = raw_input("Job name: ")
-		if action == "add":
-			args.command = [raw_input("Command to be executed: ")]
-			args.repetition = [raw_input("Repetition sentence: ")]
-			Utils.debug_print("")
-			SuperCron.add_job(args)
-		elif action == "delete":
-			Utils.debug_print("")
-			SuperCron.delete_job(args)
-		elif action == "enable":
-			Utils.debug_print("")
-			SuperCron.enable_job(args)
-		elif action == "disable":
-			Utils.debug_print("")
-			SuperCron.disable_job(args)
-		elif action == "search":
-			Utils.debug_print("")
-			SuperCron.search_job(args)
+			action = raw_input("Action [add/delete/enable/disable/search/clear]: ")
+			action = str(action.lower().strip())
+			if action not in action_list:
+				Utils.debug_print("Error: action '{}' not recognized.".format(action))
+				sys.exit(1)
+			args = Namespace()
+			if action == "clear":
+				Utils.debug_print("")
+				SuperCron.clear_jobs(args)
+				return
+			args.name = raw_input("Job name: ")
+			if action == "add":
+				args.command = [raw_input("Command to be executed: ")]
+				args.repetition = [raw_input("Repetition sentence: ")]
+				Utils.debug_print("")
+				SuperCron.add_job(args)
+			elif action == "delete":
+				Utils.debug_print("")
+				SuperCron.delete_job(args)
+			elif action == "enable":
+				Utils.debug_print("")
+				SuperCron.enable_job(args)
+			elif action == "disable":
+				Utils.debug_print("")
+				SuperCron.disable_job(args)
+			elif action == "search":
+				Utils.debug_print("")
+				SuperCron.search_job(args)
+		except KeyboardInterrupt:
+			Utils.debug_print("\nCancelled.")
 
 
 def main():
