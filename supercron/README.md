@@ -6,6 +6,14 @@ Intelligent interface to cron in UNIX systems.
 
 Run `pip install supercron` or `easy_install supercron`.
 
+## SuperCron vs classical crontab
+SuperCron is based on crontab, while providing the following additional advantages:
+- it can run interactively or non-interactively.
+- it allows controlling several jobs simultaneously if they were assigned the same job name.
+- it provides more options to handle jobs: adding, removing, searching, enabling, disabling, etc.
+- it allows a vast and flexible amount of repetition sentences.
+- it is more friendly especially to new sysadmins.
+
 ## Usage
 
 SuperCron can run either in interactive mode or non-interactive mode.
@@ -28,12 +36,12 @@ Additionally, one of the following subcommands can be used: add, delete, enable,
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
 - option `-c` or `--command`: required; here goes the command to be executed
 - option `-r` or `--repetition`: required; the repetition sentence (see examples below)
-- argument `name`: required; represents the job name which will be added
+- argument `name`: required; represents the job name which will be added (several jobs can share the same name)
 
 ***Subcommands delete, enable and disable***
 - option `-h` or `--help`: shows the help message of the subcommand
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
-- argument `name`: required; represents the job name on which the action will occur
+- argument `name`: required; represents the job name on which the action will occur (several jobs can share the same name)
 
 ***Subcommand search***
 - option `-h` or `--help`: shows the help message of the subcommand
@@ -101,8 +109,8 @@ Examples of accepted repetition sentences (case insensitive):
 - in january and april
 - in jan, aug, oct
 
-Repetition sentences can also be any logical mix of the above. For example:
+Repetition sentences can also be any (unsorted) logical mix of the above. For example:
 - at 09:00 every 3 days
 - from june to november every 2 hours
 - every 30 minutes on fri and sat
-- midnight every 2 days from monday to friday in october and december
+- midnight from monday to friday in october and december
