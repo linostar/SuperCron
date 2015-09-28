@@ -56,6 +56,10 @@ class TCronTab(CronTab):
 			else:
 				self.lines.append(line.replace('\n', ''))
 
+	def render(self):
+		self.lines = [line for line in self.lines if unicode(line).strip()]
+		return super(TCronTab, self).render()
+
 	def find_name(self, name):
 		for job in self.crons:
 			if job.get_name() == name:
