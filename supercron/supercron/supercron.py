@@ -19,7 +19,7 @@ class SuperCron:
 	"""Main SuperCron class"""
 
 	VERSION = "0.3.0"
-	TOBEDELETED = "SuperCron__TOBEDELETED"
+	TOBEDELETED = "TOBEDELETED"
 
 	@staticmethod
 	def parse_arguments():
@@ -244,7 +244,7 @@ class SuperCron:
 		cron = TCronTab(user=True)
 		for job in cron:
 			if job.is_superjob():
-				job.comment = SuperCron.TOBEDELETED
+				job.set_name(SuperCron.TOBEDELETED)
 				count += 1
 		cron.remove_all(comment=SuperCron.TOBEDELETED)
 		cron.write_to_user(user=True)
