@@ -19,7 +19,7 @@ class SuperCron:
 	"""Main SuperCron class"""
 
 	VERSION = "0.3.0"
-	TOBEDELETED = "TOBEDELETED"
+	TOBEDELETED = "@tobedeleted"
 
 	@staticmethod
 	def parse_arguments():
@@ -113,10 +113,12 @@ class SuperCron:
 				count += 1
 		if enable_it:
 			action = "enabled"
-			cron.activate_triggered_jobs(name, "enabled")
+			if count:
+				cron.activate_triggered_jobs(name, "enabled")
 		else:
 			action = "disabled"
-			cron.activate_triggered_jobs(name, "disabled")
+			if count:
+				cron.activate_triggered_jobs(name, "disabled")
 		cron.activate_triggered_jobs(name, "toggled")
 		cron.write_to_user(user=True)
 		if count == 1:
@@ -187,7 +189,7 @@ class SuperCron:
 		job.enable()
 		cron.activate_triggered_jobs(name, "added")
 		cron.write_to_user(user=True)
-		Utils.debug_print("Jobs named '{}' have been successfully added.".format(name))
+		Utils.debug_print("Job named '{}' has been successfully added.".format(name))
 
 	@staticmethod
 	def rename_job(args):
@@ -208,8 +210,9 @@ class SuperCron:
 			if job.get_name() == old_name:
 				job.set_name(new_name)
 				count += 1
-		cron.activate_triggered_jobs(old_name, "deleted")
-		cron.activate_triggered_jobs(new_name, "added")
+		if count:
+			cron.activate_triggered_jobs(old_name, "deleted")
+			cron.activate_triggered_jobs(new_name, "added")
 		cron.write_to_user(user=True)
 		if count == 0:
 			Utils.debug_print("Error: job '{}' does not exist.".format(old_name))
@@ -232,7 +235,8 @@ class SuperCron:
 			if job.get_name() == name:
 				cron.remove(job)
 				count += 1
-		cron.activate_triggered_jobs(name, "deleted")
+		if count:
+			cron.activate_triggered_jobs(name, "deleted")
 		cron.write_to_user(user=True)
 		if count == 1:
 			Utils.debug_print("1 job named '{}' has been deleted.".format(name))

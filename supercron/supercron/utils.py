@@ -8,7 +8,7 @@ class Utils:
 	"""class that contains different utilities functions"""
 
 	DEBUG = True
-	FORBIDDEN_NAMES = ("@all", "@supercron")
+	FORBIDDEN_NAMES = ("@all", "@supercron", "@tobedeleted")
 
 	DAYS = {
 		"sunday": "0",
