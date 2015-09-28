@@ -1,3 +1,5 @@
+import re
+
 from datetime import datetime
 from subprocess import Popen, PIPE
 
@@ -74,3 +76,11 @@ class Utils:
 		if "%" in name:
 			return -2
 		return 0
+
+	@staticmethod
+	def parse_trigger(string):
+		matched = re.match(r"(on|off|toggle)\s+if\s+(.+)\s*==\s*(enabled|disabled|added|removed)",
+			string.strip(), re.IGNORECASE)
+		if matched:
+			trigger = [matched.group(1).lower(), matched.group(2), matched.group(3).lower()]
+			return trigger

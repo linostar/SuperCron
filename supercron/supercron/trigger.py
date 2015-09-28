@@ -1,4 +1,3 @@
-import re
 import codecs
 import subprocess as sp
 
@@ -57,6 +56,11 @@ class TCronTab(CronTab):
 			else:
 				self.lines.append(line.replace('\n', ''))
 
+	def find_name(self, name):
+		for job in self.crons:
+			if job.get_name() == name:
+				yield job
+
 	def check_triggering_jobs(self, job, trigger):
 		cron = CronTab(user=True)
 		if trigger == "enabled":
@@ -98,13 +102,6 @@ class TCronItem(CronItem):
 		else:
 			self.comment = name
 
-	def parse_trigger(self, string):
-		matched = re.match(r"(on|off|toggle)\s+if\s+(.+)\s*==\s*(enabled|disabled|added|removed)",
-			string.strip(), re.IGNORECASE)
-		if matched:
-			trigger = [matched.group(1).lower(), matched.group(2), matched.group(3).lower()]
-			return trigger
-
 	def get_trigger(self):
 		if self.is_superjob():
 			sep = self.comment.find(self.SEPARATOR)
@@ -115,10 +112,14 @@ class TCronItem(CronItem):
 		if self.is_superjob():
 			trigger_string = ":".join(trigger)
 			sep = self.comment.find(self.SEPARATOR)
-			if sep == -1:
-				self.comment += self.SEPARATOR + trigger_string
+			if trigger:
+				if sep == -1:
+					self.comment += self.SEPARATOR + trigger_string
+				else:
+					self.comment = self.comment[:sep] + self.SEPARATOR + trigger_string
 			else:
-				self.comment = self.comment[:sep] + self.SEPARATOR + trigger_string
+				if sep != -1:
+					self.comment = self.comment[:sep]
 		else:
 			# do nothing for non-superjobs
 			pass

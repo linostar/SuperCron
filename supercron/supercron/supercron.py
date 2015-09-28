@@ -32,7 +32,9 @@ class SuperCron:
 			"\n\tEnable a job:\tsupercron enable log_dates" +
 			"\n\tDisable a job:\tsupercron disable log_dates" +
 			"\n\tSearch jobs:\tsupercron search log_dates" +
-			"\n\tClear all jobs:\tsupercron clear")
+			"\n\tClear all jobs:\tsupercron clear" +
+			"\n\tAdd trigger:\tsupercon trigger -t \"off if log_months==disabled\" log_dates" +
+			"\n\tRemove trigger:\tsupercron trigger -t none log_dates")
 		parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
 			SuperCron.VERSION), help="display version number and exit")
 		# Add subparsers
@@ -47,6 +49,8 @@ class SuperCron:
 			description="For enabling a SuperCron job in user's crontab.")
 		parser_disable = subparsers.add_parser("disable", help="for disabling a job",
 			description="For disabling a SuperCron job in user's crontab.")
+		parser_trigger = subparsers.add_parser("trigger", help="for adding/changing/removing a trigger",
+			description="For adding/changing/removing a trigger on a job.")
 		parser_search = subparsers.add_parser("search", help="for searching for a job by name",
 			formatter_class=argparse.RawDescriptionHelpFormatter,
 			description="For listing SuperCron jobs that match the exact name supplied.\n" +
@@ -87,6 +91,11 @@ class SuperCron:
 		parser_clear.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
 		parser_clear.add_argument("-f", "--force", action="store_true", help="do not ask for confirmation before clearing")
 		parser_clear.set_defaults(func=SuperCron.clear_jobs)
+		# subcommand 'trigger' arguments
+		parser_trigger.add_argument("-q", "--quiet", action="store_true", help="do not print any output or error messages")
+		parser_trigger.add_argument("-t", "--trigger", nargs=1, required=True, help="NONE, or in the form of: ACTION if NAME==STATE")
+		parser_trigger.add_argument("name", help="name of the triggered job")
+		parser_trigger.set_defaults(func=SuperCron.trigger_job)
 		# parse all args
 		args = parser.parse_args()
 		args.func(args)
@@ -264,22 +273,22 @@ class SuperCron:
 			if name == "@all":
 				for job in cron:
 					job_name = job.get_name()
-					enabled = "YES" if job.is_enabled() else "NO"
+					enabled = "ON" if job.is_enabled() else "OFF"
 					job_list.append([job_name, enabled, str(job.slices), job.command])
 			elif name == "@supercron":
 				for job in cron:
 					if job.is_superjob():
 						job_name = job.get_name()
-						enabled = "YES" if job.is_enabled() else "NO"
+						enabled = "ON" if job.is_enabled() else "OFF"
 						job_list.append([job_name, enabled, str(job.slices), job.command])
 			else:
-				jobs = cron.find_comment(name)
+				jobs = cron.find_name(name)
 				for job in jobs:
-					enabled = "YES" if job.is_enabled() else "NO"
+					enabled = "ON" if job.is_enabled() else "OFF"
 					job_list.append([name, enabled, str(job.slices), job.command])
 			if job_list:
 				col_widths = []
-				col_titles = ["Name", "Enabled", "Repetition", "Command"]
+				col_titles = ["Name", "State", "Repetition", "Command"]
 				for i in range(0, 4):
 					col_widths.append(max(max(len(n[i]) for n in job_list) + 2, len(col_titles[i]) + 2))
 				Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(col_titles, range(0, 4))))
@@ -293,6 +302,28 @@ class SuperCron:
 		except:
 			# in case of any error, so the unittests can detect it
 			return -1
+
+	@staticmethod
+	def trigger_job(args):
+		count = 0
+		cron = TCronTab(user=True)
+		if "quiet" in args:
+			Utils.DEBUG = not args.quiet
+		name = str(args.name)
+		trigger = str(args.trigger[0])
+		jobs = cron.find_name(name)
+		if trigger.lower().strip() == "none":
+			for job in jobs:
+				job.set_trigger("")
+		else:
+			trigger = Utils.parse_trigger(trigger.strip())
+			if trigger:
+				for job in jobs:
+					job.set_trigger(trigger)
+			else:
+				Utils.debug_print("Error: invalid trigger (expected format is \"NONE\" or \"ACTION if NAME==STATE\").")
+				sys.exit(1)
+		cron.write_to_user(user=True)
 
 	@staticmethod
 	def interactive_mode():
