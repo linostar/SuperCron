@@ -9,12 +9,12 @@ try:
 	from namespace import Namespace
 	from utils import Utils
 	from repetition_parsing import Repetition
-	from trigger import Trigger
+	from trigger import TCronTab
 except ImportError:
 	from supercron.namespace import Namespace
 	from supercron.utils import Utils
 	from supercron.repetition_parsing import Repetition
-	from supercron.trigger import Trigger
+	from supercron.trigger import TCronTab
 
 
 class SuperCron:
