@@ -19,8 +19,7 @@ class SuperCron:
 	"""Main SuperCron class"""
 
 	VERSION = "0.3.0"
-	PREFIX = "SuperCron__"
-	TOBEDELETED = PREFIX + "TOBEDELETED"
+	TOBEDELETED = "SuperCron__TOBEDELETED"
 
 	@staticmethod
 	def parse_arguments():
@@ -244,7 +243,7 @@ class SuperCron:
 		count = 0
 		cron = TCronTab(user=True)
 		for job in cron:
-			if job.comment.startswith(SuperCron.PREFIX):
+			if job.is_superjob():
 				job.comment = SuperCron.TOBEDELETED
 				count += 1
 		cron.remove_all(comment=SuperCron.TOBEDELETED)
@@ -264,16 +263,13 @@ class SuperCron:
 			cron = TCronTab(user=True)
 			if name == "@all":
 				for job in cron:
-					if job.comment.startswith(SuperCron.PREFIX):
-						job_name = job.comment[len(SuperCron.PREFIX):]
-					else:
-						job_name = job.comment
+					job_name = job.get_name()
 					enabled = "YES" if job.is_enabled() else "NO"
 					job_list.append([job_name, enabled, str(job.slices), job.command])
 			elif name == "@supercron":
 				for job in cron:
-					if job.comment.startswith(SuperCron.PREFIX):
-						job_name = job.comment[len(SuperCron.PREFIX):]
+					if job.is_superjob():
+						job_name = job.get_name()
 						enabled = "YES" if job.is_enabled() else "NO"
 						job_list.append([job_name, enabled, str(job.slices), job.command])
 			else:

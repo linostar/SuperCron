@@ -70,6 +70,9 @@ class TCronItem(CronItem):
 	def __init__(self, line=None, command='', comment='', user=None, cron=None):
 		super(TCronItem, self).__init__(line, command, comment, user, cron)
 
+	def is_superjob(self):
+		return self.comment.startswith(self.PREFIX)
+
 	def get_name(self):
 		if self.comment.startswith(self.PREFIX):
 			sep = self.comment.find("%")
