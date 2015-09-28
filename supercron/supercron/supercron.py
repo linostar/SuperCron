@@ -33,7 +33,7 @@ class SuperCron:
 			"\n\tDisable a job:\tsupercron disable log_dates" +
 			"\n\tSearch jobs:\tsupercron search log_dates" +
 			"\n\tClear all jobs:\tsupercron clear" +
-			"\n\tAdd trigger:\tsupercon trigger -t \"off if log_months==disabled\" log_dates" +
+			"\n\tAdd trigger:\tsupercon trigger -t \"off if log_months is disabled\" log_dates" +
 			"\n\tRemove trigger:\tsupercron trigger -t none log_dates")
 		parser.add_argument("-V", "--version", action="version", version="SuperCron v{}".format(
 			SuperCron.VERSION), help="display version number and exit")
@@ -305,6 +305,7 @@ class SuperCron:
 
 	@staticmethod
 	def trigger_job(args):
+		remove_trigger = False
 		count = 0
 		cron = TCronTab(user=True)
 		if "quiet" in args:
@@ -313,25 +314,40 @@ class SuperCron:
 		trigger = str(args.trigger[0])
 		jobs = cron.find_name(name)
 		if trigger.lower().strip() == "none":
+			remove_trigger = True
 			for job in jobs:
 				job.set_trigger("")
+				count += 1
 		else:
-			trigger = Utils.parse_trigger(trigger.strip())
-			if trigger:
+			trigger_list = Utils.parse_trigger(trigger.strip())
+			if trigger_list:
 				for job in jobs:
-					job.set_trigger(trigger)
+					job.set_trigger(trigger_list)
+					count += 1
 			else:
-				Utils.debug_print("Error: invalid trigger (expected format is \"NONE\" or \"ACTION if NAME==STATE\").")
+				Utils.debug_print("Error: invalid trigger (expected format is \"NONE\" or \"ACTION if NAME is STATE\").")
 				sys.exit(1)
 		cron.write_to_user(user=True)
+		if remove_trigger:
+			if count == 1:
+				Utils.debug_print("Trigger removed from 1 job named '{}'.".format(name))
+			else:
+				Utils.debug_print("Trigger removed from {} jobs named '{}'.".format(count, name))
+		else:
+			if count == 1:
+				Utils.debug_print("Trigger '{}' added to 1 job named '{}'."
+					.format(trigger.strip(), name))
+			else:
+				Utils.debug_print("Trigger '{}' added to {} jobs named '{}'."
+					.format(trigger.strip(), count, name))
 
 	@staticmethod
 	def interactive_mode():
 		try:
-			action_list = ("add", "rename", "delete", "enable", "disable", "search", "clear")
+			action_list = ("add", "rename", "delete", "enable", "disable", "search", "clear", "trigger")
 			Utils.debug_print("SuperCron (interactive mode)")
 			Utils.debug_print("")
-			action = raw_input("Action [add/rename/delete/enable/disable/search/clear]: ")
+			action = raw_input("Action [add/rename/delete/enable/disable/trigger/search/clear]: ")
 			action = str(action.lower().strip())
 			if action not in action_list:
 				Utils.debug_print("Error: action '{}' not recognized.".format(action))
@@ -346,6 +362,16 @@ class SuperCron:
 				args.new_name = raw_input("Job new name: ")
 				Utils.debug_print("")
 				SuperCron.rename_job(args)
+				return
+			if action == "trigger":
+				trigger_parts = []
+				args.name = raw_input("Enter name of triggered job: ")
+				trigger_parts.append(raw_input("Action on the triggered job [on/off/toggle]: "))
+				trigger_parts.append(raw_input("Name of the triggering job: "))
+				trigger_parts.append(raw_input("Condition on the triggering job [enabled/disabled/toggled/added/deleted]: "))
+				args.trigger = ["{t[0]} if {t[1]}=={t[2]}".format(t=trigger_parts)]
+				Utils.debug_print("")
+				SuperCron.trigger_job(args)
 				return
 			args.name = raw_input("Job name: ")
 			if action == "add":

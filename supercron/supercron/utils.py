@@ -79,7 +79,7 @@ class Utils:
 
 	@staticmethod
 	def parse_trigger(string):
-		matched = re.match(r"(on|off|toggle)\s+if\s+(.+)\s*==\s*(enabled|disabled|added|removed)",
+		matched = re.match(r"(on|off|toggle)\s+if\s+(.+)\s+is\s+(enabled|disabled|toggled|added|removed)",
 			string.strip(), re.IGNORECASE)
 		if matched:
 			trigger = [matched.group(1).lower(), matched.group(2), matched.group(3).lower()]
