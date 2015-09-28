@@ -1,3 +1,6 @@
+import codecs
+import subprocess as sp
+
 from crontab import CronTab, CronItem
 
 
@@ -9,6 +12,14 @@ class TCronTab(CronTab):
 	def __init__(self, user=None, tab=None, tabfile=None, log=None):
 		super(TCronTab, self).__init__(user, tab, tabfile, log)
 
+	def pipeOpen(self, cmd, *args, **flags):
+		l = tuple(cmd.split(' '))
+		for (k,v) in flags.items():
+			if v is not None:
+				l += len(k)==1 and ("-%s" % (k,), str(v)) or ("--%s=%s" % (k,v),)
+		l += tuple(args)
+		return sp.Popen(tuple(a for a in l if a), stdout=sp.PIPE, stderr=sp.PIPE)
+
 	def find_comment(self, comment):
 		return super(TCronTab, self).find_comment(PREFIX + comment)
 
@@ -19,6 +30,31 @@ class TCronTab(CronTab):
 		self.crons.append(item)
 		self.lines.append(item)
 		return item
+
+	def read(self, filename=None):
+		self.crons = []
+		self.lines = []
+		lines = []
+		if self.intab is not None:
+			lines = self.intab.split('\n')
+		elif filename:
+			self.filen = filename
+			with codecs.open(filename, 'r', encoding='utf-8') as fhl:
+				lines = fhl.readlines()
+		elif self.user:
+			(out, err) = self.pipeOpen(CRONCMD, l='', **self.user_opt).communicate()
+			if err and 'no crontab for' in str(err):
+				pass
+			elif err:
+				raise IOError("Read crontab %s: %s" % (self.user, err))
+			lines = out.decode('utf-8').split("\n")
+		for line in lines:
+			cron = TCronItem(line, cron=self)
+			if cron.is_valid():
+				self.crons.append(cron)
+				self.lines.append(cron)
+			else:
+				self.lines.append(line.replace('\n', ''))
 
 	def check_triggering_jobs(self, job, trigger):
 		cron = CronTab(user=True)
@@ -45,7 +81,7 @@ class TCronItem(CronItem):
 			return self.comment
 
 	def set_name(self, name):
-		if if self.comment.startswith(self.PREFIX):
+		if self.comment.startswith(self.PREFIX):
 			sep = self.comment.find("%")
 			if sep == -1 or sep == len(self.comment) - 1:
 				self.comment = name
