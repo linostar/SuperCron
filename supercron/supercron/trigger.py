@@ -1,3 +1,4 @@
+import re
 import codecs
 import subprocess as sp
 
@@ -8,7 +9,7 @@ class TCronTab(CronTab):
 	"""class for extending CronTab with triggers"""
 
 	PREFIX = "SuperCron__"
-
+	
 	def __init__(self, user=None, tab=None, tabfile=None, log=None):
 		super(TCronTab, self).__init__(user, tab, tabfile, log)
 
@@ -66,6 +67,7 @@ class TCronItem(CronItem):
 	"""class for extending CronItem with triggers"""
 
 	PREFIX = "SuperCron__"
+	SEPARATOR = "%"
 
 	def __init__(self, line=None, command='', comment='', user=None, cron=None):
 		super(TCronItem, self).__init__(line, command, comment, user, cron)
@@ -74,24 +76,49 @@ class TCronItem(CronItem):
 		return self.comment.startswith(self.PREFIX)
 
 	def get_name(self):
-		if self.comment.startswith(self.PREFIX):
-			sep = self.comment.find("%")
+		if self.is_superjob():
+			sep = self.comment.find(self.SEPARATOR)
 			if sep == -1:
 				return self.comment[len(self.PREFIX):]
-			return self.comment[len(self.PREFIX):sep].rstrip()
+			return self.comment[len(self.PREFIX):sep]
 		else:
 			# not a SuperCron job
 			return self.comment
 
 	def set_name(self, name):
-		if self.comment.startswith(self.PREFIX):
-			sep = self.comment.find("%")
+		if self.is_superjob():
+			sep = self.comment.find(self.SEPARATOR)
 			if sep == -1 or sep == len(self.comment) - 1:
 				self.comment = self.PREFIX + name
 			else:
-				self.comment = self.PREFIX + name + " %" + self.comment[sep+1:]
+				self.comment = self.PREFIX + name + self.SEPARATOR + self.comment[sep+1:]
 		elif self.comment:
 			# this is not a SuperCron job, so don't edit
 			pass
 		else:
 			self.comment = name
+
+	def parse_trigger(self, string):
+		matched = re.match(r"(on|off|toggle)\s+if\s+(.+)\s*==\s*(enabled|disabled|added|removed)",
+			string.strip(), re.IGNORECASE)
+		if matched:
+			trigger = [matched.group(1).lower(), matched.group(2), matched.group(3).lower()]
+			return trigger
+
+	def get_trigger(self):
+		if self.is_superjob():
+			sep = self.comment.find(self.SEPARATOR)
+			if sep not in (-1, 0, len(self.comment)-1):
+				return self.comment[sep+1:].split(":")
+
+	def set_trigger(self, trigger):
+		if self.is_superjob():
+			trigger_string = ":".join(trigger)
+			sep = self.comment.find(self.SEPARATOR)
+			if sep == -1:
+				self.comment += self.SEPARATOR + trigger_string
+			else:
+				self.comment = self.comment[:sep] + self.SEPARATOR + trigger_string
+		else:
+			# do nothing for non-superjobs
+			pass
