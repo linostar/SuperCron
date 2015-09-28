@@ -9,16 +9,18 @@ try:
 	from namespace import Namespace
 	from utils import Utils
 	from repetition_parsing import Repetition
+	from trigger import Trigger
 except ImportError:
 	from supercron.namespace import Namespace
 	from supercron.utils import Utils
 	from supercron.repetition_parsing import Repetition
+	from supercron.trigger import Trigger
 
 
 class SuperCron:
 	"""Main SuperCron class"""
 
-	VERSION = "0.2.0"
+	VERSION = "0.3.0"
 	PREFIX = "SuperCron__"
 	TOBEDELETED = PREFIX + "TOBEDELETED"
 
@@ -133,8 +135,11 @@ class SuperCron:
 		if "quiet" in args:
 			Utils.DEBUG = not args.quiet
 		name = str(args.name)
-		if not Utils.check_job_name(name):
+		if Utils.check_job_name(name) == -1:
 			Utils.debug_print("Error: job name cannot be '{}'.".format(name))
+			sys.exit(1)
+		if Utils.check_job_name(name) == -2:
+			Utils.debug_print("Error: job name cannot contain a '%' symbol.")
 			sys.exit(1)
 		command = str(args.command[0])
 		repetition = str(args.repetition[0])
@@ -182,8 +187,11 @@ class SuperCron:
 		count = 0
 		old_name = str(args.old_name)
 		new_name = str(args.new_name)
-		if not Utils.check_job_name(new_name):
+		if Utils.check_job_name(new_name) == -1:
 			Utils.debug_print("Error: job name cannot be '{}'.".format(name))
+			sys.exit(1)
+		if Utils.check_job_name(new_name) == -2:
+			Utils.debug_print("Error: job name cannot contain a '%' symbol.")
 			sys.exit(1)
 		cron = CronTab(user=True)
 		for job in cron:

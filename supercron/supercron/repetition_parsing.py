@@ -5,6 +5,7 @@ try:
 except ImportError:
 	from supercron.utils import Utils
 
+
 class Repetition:
 	"""class for parsing repetition clauses"""
 

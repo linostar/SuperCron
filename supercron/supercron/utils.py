@@ -1,6 +1,7 @@
 from datetime import datetime
 from subprocess import Popen, PIPE
 
+
 class Utils:
 	"""class that contains different utilities functions"""
 
@@ -38,6 +39,7 @@ class Utils:
 
 	@staticmethod
 	def debug_print(string, force_print=False):
+		"""turn on/off output/error printing"""
 		if Utils.DEBUG or force_print:
 			print(string)
 
@@ -50,6 +52,7 @@ class Utils:
 
 	@staticmethod
 	def list_to_dict(name, command="", repetition=""):
+		"""convert structure-predefined lists to dicts"""
 		args_dict = {}
 		args_dict['name'] = name
 		args_dict['command'] = [command]
@@ -58,11 +61,16 @@ class Utils:
 
 	@staticmethod
 	def get_crontab():
+		"""get user's crontab to compare in tests"""
 		p = Popen(["crontab", "-l"], stdout=PIPE, stderr=PIPE)
 		crontab_out, crontab_err = p.communicate()
 		return crontab_out
 
 	@staticmethod
 	def check_job_name(name):
-		if name not in Utils.FORBIDDEN_NAMES:
-			return True
+		"""check whether job name contains preserved keywords or symbols"""
+		if name in Utils.FORBIDDEN_NAMES:
+			return -1
+		if "%" in name:
+			return -2
+		return 0
