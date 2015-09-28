@@ -113,8 +113,11 @@ class SuperCron:
 				count += 1
 		if enable_it:
 			action = "enabled"
+			cron.activate_triggered_jobs(name, "enabled")
 		else:
 			action = "disabled"
+			cron.activate_triggered_jobs(name, "disabled")
+		cron.activate_triggered_jobs(name, "toggled")
 		cron.write_to_user(user=True)
 		if count == 1:
 			Utils.debug_print("1 job named '{}' has been {}.".format(name, action))
@@ -182,6 +185,7 @@ class SuperCron:
 			if "month_on" in repeat:
 				job.month.on(*repeat['month_on'])
 		job.enable()
+		cron.activate_triggered_jobs(name, "added")
 		cron.write_to_user(user=True)
 		Utils.debug_print("Jobs named '{}' have been successfully added.".format(name))
 
@@ -204,6 +208,8 @@ class SuperCron:
 			if job.get_name() == old_name:
 				job.set_name(new_name)
 				count += 1
+		cron.activate_triggered_jobs(old_name, "deleted")
+		cron.activate_triggered_jobs(new_name, "added")
 		cron.write_to_user(user=True)
 		if count == 0:
 			Utils.debug_print("Error: job '{}' does not exist.".format(old_name))
@@ -226,6 +232,7 @@ class SuperCron:
 			if job.get_name() == name:
 				cron.remove(job)
 				count += 1
+		cron.activate_triggered_jobs(name, "deleted")
 		cron.write_to_user(user=True)
 		if count == 1:
 			Utils.debug_print("1 job named '{}' has been deleted.".format(name))
@@ -254,6 +261,7 @@ class SuperCron:
 		for job in cron:
 			if job.is_superjob():
 				job.set_name(SuperCron.TOBEDELETED)
+				job.set_trigger("")
 				count += 1
 		cron.remove_all(comment=SuperCron.TOBEDELETED)
 		cron.write_to_user(user=True)
@@ -274,27 +282,27 @@ class SuperCron:
 				for job in cron:
 					job_name = job.get_name()
 					enabled = "ON" if job.is_enabled() else "OFF"
-					job_list.append([job_name, enabled, str(job.slices), job.command])
+					job_list.append([job_name, job.repr_trigger(), enabled, str(job.slices), job.command])
 			elif name == "@supercron":
 				for job in cron:
 					if job.is_superjob():
 						job_name = job.get_name()
 						enabled = "ON" if job.is_enabled() else "OFF"
-						job_list.append([job_name, enabled, str(job.slices), job.command])
+						job_list.append([job_name, enabled, job.repr_trigger(), str(job.slices), job.command])
 			else:
 				jobs = cron.find_name(name)
 				for job in jobs:
 					enabled = "ON" if job.is_enabled() else "OFF"
-					job_list.append([name, enabled, str(job.slices), job.command])
+					job_list.append([name, enabled, job.repr_trigger(), str(job.slices), job.command])
 			if job_list:
 				col_widths = []
-				col_titles = ["Name", "State", "Repetition", "Command"]
-				for i in range(0, 4):
+				col_titles = ["Name", "State", "Trigger", "Repetition", "Command"]
+				for i in range(0, 5):
 					col_widths.append(max(max(len(n[i]) for n in job_list) + 2, len(col_titles[i]) + 2))
-				Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(col_titles, range(0, 4))))
+				Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(col_titles, range(0, 5))))
 				Utils.debug_print("-" * (sum(col_widths) - 2))
 				for job_item in job_list:
-					Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(job_item, range(0, 4))))
+					Utils.debug_print("".join(word.ljust(col_widths[i]) for word, i in zip(job_item, range(0, 5))))
 					count += 1
 			else:
 				Utils.debug_print("Zero search results.")
@@ -325,20 +333,21 @@ class SuperCron:
 					job.set_trigger(trigger_list)
 					count += 1
 			else:
+				print(trigger.strip())
 				Utils.debug_print("Error: invalid trigger (expected format is \"NONE\" or \"ACTION if NAME is STATE\").")
 				sys.exit(1)
 		cron.write_to_user(user=True)
 		if remove_trigger:
 			if count == 1:
-				Utils.debug_print("Trigger removed from 1 job named '{}'.".format(name))
+				Utils.debug_print("Trigger was removed from 1 job named '{}'.".format(name))
 			else:
-				Utils.debug_print("Trigger removed from {} jobs named '{}'.".format(count, name))
+				Utils.debug_print("Trigger was removed from {} jobs named '{}'.".format(count, name))
 		else:
 			if count == 1:
-				Utils.debug_print("Trigger '{}' added to 1 job named '{}'."
+				Utils.debug_print("Trigger '{}' was added to 1 job named '{}'."
 					.format(trigger.strip(), name))
 			else:
-				Utils.debug_print("Trigger '{}' added to {} jobs named '{}'."
+				Utils.debug_print("Trigger '{}' was added to {} jobs named '{}'."
 					.format(trigger.strip(), count, name))
 
 	@staticmethod
@@ -369,7 +378,7 @@ class SuperCron:
 				trigger_parts.append(raw_input("Action on the triggered job [on/off/toggle]: "))
 				trigger_parts.append(raw_input("Name of the triggering job: "))
 				trigger_parts.append(raw_input("Condition on the triggering job [enabled/disabled/toggled/added/deleted]: "))
-				args.trigger = ["{t[0]} if {t[1]}=={t[2]}".format(t=trigger_parts)]
+				args.trigger = ["{t[0]} if {t[1]} is {t[2]}".format(t=trigger_parts)]
 				Utils.debug_print("")
 				SuperCron.trigger_job(args)
 				return

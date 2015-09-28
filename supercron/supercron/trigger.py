@@ -61,10 +61,18 @@ class TCronTab(CronTab):
 			if job.get_name() == name:
 				yield job
 
-	def check_triggering_jobs(self, job, trigger):
-		cron = CronTab(user=True)
-		if trigger == "enabled":
-			pass
+	def find_trigger(self, trigger_list):
+		for job in self.crons:
+			if job.get_trigger() == trigger_list:
+				yield job
+
+	def activate_triggered_jobs(self, job, state):
+		for job in self.find_trigger(["toggle", job, state]):
+			job.enable(not job.is_enabled())
+		for job in self.find_trigger(["on", job, state]):
+			job.enable(True)
+		for job in self.find_trigger(["off", job, state]):
+			job.enable(False)
 
 
 class TCronItem(CronItem):
@@ -123,3 +131,9 @@ class TCronItem(CronItem):
 		else:
 			# do nothing for non-superjobs
 			pass
+
+	def repr_trigger(self):
+		trigger = self.get_trigger()
+		if not trigger:
+			return "NONE"
+		return "{} IF {} IS {}".format(trigger[0].upper(), trigger[1], trigger[2].upper())
