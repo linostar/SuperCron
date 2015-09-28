@@ -3,8 +3,6 @@
 import sys
 import argparse
 
-from crontab import CronTab
-
 try:
 	from namespace import Namespace
 	from utils import Utils
@@ -100,9 +98,9 @@ class SuperCron:
 		if quiet != None:
 			Utils.DEBUG = not quiet
 		count = 0
-		cron = CronTab(user=True)
+		cron = TCronTab(user=True)
 		for job in cron:
-			if job.comment == SuperCron.PREFIX + name and job.is_enabled() != enable_it:
+			if job.get_name() == name and job.is_enabled() != enable_it:
 				job.enable(enable_it)
 				count += 1
 		if enable_it:
@@ -148,8 +146,8 @@ class SuperCron:
 			Utils.debug_print("Error: invalid repetition sentence: '{}'."
 				.format(repetition))
 			sys.exit(1)
-		cron = CronTab(user=True)
-		job = cron.new(command=command, comment=SuperCron.PREFIX + name)
+		cron = TCronTab(user=True)
+		job = cron.new(command=command, comment=name)
 		if "reboot" in repeat:
 			job.every_reboot()
 		else:
@@ -193,10 +191,10 @@ class SuperCron:
 		if Utils.check_job_name(new_name) == -2:
 			Utils.debug_print("Error: job name cannot contain a '%' symbol.")
 			sys.exit(1)
-		cron = CronTab(user=True)
+		cron = TCronTab(user=True)
 		for job in cron:
-			if job.comment == SuperCron.PREFIX + old_name:
-				job.comment = SuperCron.PREFIX + new_name
+			if job.get_name() == old_name:
+				job.set_name(new_name)
 				count += 1
 		cron.write_to_user(user=True)
 		if count == 0:
@@ -215,9 +213,9 @@ class SuperCron:
 			Utils.DEBUG = not args.quiet
 		name = str(args.name)
 		count = 0
-		cron = CronTab(user=True)
+		cron = TCronTab(user=True)
 		for job in cron:
-			if job.comment == SuperCron.PREFIX + name:
+			if job.get_name() == name:
 				cron.remove(job)
 				count += 1
 		cron.write_to_user(user=True)
@@ -244,7 +242,7 @@ class SuperCron:
 	def _generic_clear_jobs(args, quiet):
 		Utils.DEBUG = not quiet
 		count = 0
-		cron = CronTab(user=True)
+		cron = TCronTab(user=True)
 		for job in cron:
 			if job.comment.startswith(SuperCron.PREFIX):
 				job.comment = SuperCron.TOBEDELETED
@@ -263,7 +261,7 @@ class SuperCron:
 			count = 0
 			name = str(args.name)
 			job_list = []
-			cron = CronTab(user=True)
+			cron = TCronTab(user=True)
 			if name == "@all":
 				for job in cron:
 					if job.comment.startswith(SuperCron.PREFIX):
@@ -279,7 +277,7 @@ class SuperCron:
 						enabled = "YES" if job.is_enabled() else "NO"
 						job_list.append([job_name, enabled, str(job.slices), job.command])
 			else:
-				jobs = cron.find_comment(SuperCron.PREFIX + name)
+				jobs = cron.find_comment(name)
 				for job in jobs:
 					enabled = "YES" if job.is_enabled() else "NO"
 					job_list.append([name, enabled, str(job.slices), job.command])

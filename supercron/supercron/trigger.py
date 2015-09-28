@@ -21,7 +21,7 @@ class TCronTab(CronTab):
 		return sp.Popen(tuple(a for a in l if a), stdout=sp.PIPE, stderr=sp.PIPE)
 
 	def find_comment(self, comment):
-		return super(TCronTab, self).find_comment(PREFIX + comment)
+		return super(TCronTab, self).find_comment(self.PREFIX + comment)
 
 	def new(self, command="", comment="", user=None):
 		if not user and self.user is False:
@@ -42,7 +42,7 @@ class TCronTab(CronTab):
 			with codecs.open(filename, 'r', encoding='utf-8') as fhl:
 				lines = fhl.readlines()
 		elif self.user:
-			(out, err) = self.pipeOpen(CRONCMD, l='', **self.user_opt).communicate()
+			(out, err) = self.pipeOpen("crontab", l='', **self.user_opt).communicate()
 			if err and 'no crontab for' in str(err):
 				pass
 			elif err:
@@ -74,8 +74,8 @@ class TCronItem(CronItem):
 		if self.comment.startswith(self.PREFIX):
 			sep = self.comment.find("%")
 			if sep == -1:
-				return self.comment
-			return self.comment[:sep].rstrip()
+				return self.comment[len(self.PREFIX):]
+			return self.comment[len(self.PREFIX):sep].rstrip()
 		else:
 			# not a SuperCron job
 			return self.comment
@@ -84,9 +84,9 @@ class TCronItem(CronItem):
 		if self.comment.startswith(self.PREFIX):
 			sep = self.comment.find("%")
 			if sep == -1 or sep == len(self.comment) - 1:
-				self.comment = name
+				self.comment = self.PREFIX + name
 			else:
-				self.comment = name + " %" + self.comment[sep+1:]
+				self.comment = self.PREFIX + name + " %" + self.comment[sep+1:]
 		elif self.comment:
 			# this is not a SuperCron job, so don't edit
 			pass
