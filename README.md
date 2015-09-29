@@ -13,6 +13,7 @@ SuperCron is based on crontab, while providing the following additional advantag
 - it allows controlling several jobs simultaneously if they were assigned the same job name.
 - it provides more options to handle jobs: adding, removing, searching, enabling, disabling, etc.
 - it allows a vast and flexible amount of repetition sentences.
+- it allows trigger-induced jobs based on the states of other jobs.
 - it is more friendly especially to new sysadmins.
 
 ## Usage
@@ -25,12 +26,12 @@ Run `supercron` without any arguments to start interactive mode. You will prompt
 
 **Non-interactive mode:**
 
-In non-interactive mode, at least one of the following options/arguments has to be used after the command name `supercron`.
+In non-interactive mode, one of the following options can be used after the command name `supercron`.
 
 - option `-h` or `--help`: shows the help message, with some usage examples
 - option `-V` or `--version`: displays the version number
 
-Additionally, one of the following subcommands can be used: add, delete, enable, disable, search, clear.
+Additionally, one of the following subcommands can be used: add, delete, enable, disable, search, clear, trigger.
 
 ***Subcommand add***
 - option `-h` or `--help`: shows the help message of the subcommand
@@ -55,18 +56,16 @@ Additionally, one of the following subcommands can be used: add, delete, enable,
 - argument `name`: required; the exact job name to search for, or `@supercron` to list all SuperCron jobs, or `@all` to list all user's crontab entries
 
 ***Subcommand clear***
-
-It will only clear SuperCron jobs from user's crontab:
 - option `-h` or `--help`: shows the help message of the subcommand
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
 - option `-f` or `--force`: skips asking for confirmation before clearing all jobs
 
-***Subcommand trigger***
+Note: this subcommand will only clear SuperCron jobs from user's crontab.
 
-It will only clear SuperCron jobs from user's crontab:
+***Subcommand trigger***
 - option `-h` or `--help`: shows the help message of the subcommand
 - option `-q` or `--quiet`: optional; suppresses all output and error messages
-- option `-t` or `--trigger`: trigger in the form of "**none**" or "*ACTION* if *NAME* is *STATE*". See **Triggers** section below.
+- option `-t` or `--trigger`: trigger in the form of "none" or "*ACTION* if *NAME* is *STATE*". See **Triggers** section below.
 - argument `name`: required; represents the triggered job name on which *ACTION* will occur (several jobs can share the same name)
 
 ## Examples
@@ -147,7 +146,7 @@ Repetition sentences can also be any (unsorted) logical mix of the above. For ex
 ## Triggers
 Triggers can take one of 2 forms:
 - "none" for removing the previous trigger
-- "*ACTION* if *NAME* is *STATE*" to add a new trigger or replace an old one
+- "*ACTION* if *NAME* is *STATE*" for adding a new trigger or replacing an old one
 
 *ACTION* is the action applied on the enabled state of the triggered job and it can be `on`, `off` or `toggled`.
 
@@ -155,8 +154,8 @@ Triggers can take one of 2 forms:
 
 *STATE* is the triggering state of the triggering job, and it can be `enabled`, `disabled`, `toggled`, `added` or `deleted`.
 
-Action `toggle` means to enable the triggered job if it was disabled, and to disable it if it was enabled.
+Using action `toggle` means to enable the triggered job if it was disabled, and to disable it if it was enabled.
 
 State `toggled` activates the trigger when the triggering job is enabled or disabled.
 
-Note that when a job is renamed from *name1* to *name2*, it means activating triggers that end with "if name1 is deleted" and triggers that end with "if name2 is added", since a rename is considered a deletion of the old job name and an addition of the new job name.
+Note that when a job is renamed from *name1* to *name2*, it means activating triggers that end with `if name1 is deleted` and triggers that end with `if name2 is added`, since a rename is considered a deletion of the old job name and an addition of the new job name.
