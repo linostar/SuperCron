@@ -48,6 +48,7 @@
 <li>it allows controlling several jobs simultaneously if they were assigned the same job name.</li>
 <li>it provides more options to handle jobs: adding, removing, searching, enabling, disabling, etc.</li>
 <li>it allows a vast and flexible amount of repetition sentences.</li>
+<li>it allows trigger-induced jobs based on the states of other jobs.</li>
 <li>it is more friendly especially to new sysadmins.</li>
 </ul>
 
@@ -62,14 +63,14 @@
 
 <p><strong>Non-interactive mode:</strong></p>
 
-<p>In non-interactive mode, at least one of the following options/arguments has to be used after the command name <code>supercron</code>.</p>
+<p>In non-interactive mode, one of the following options can be used after the command name <code>supercron</code>.</p>
 
 <ul>
 <li>option <code>-h</code> or <code>--help</code>: shows the help message, with some usage examples</li>
 <li>option <code>-V</code> or <code>--version</code>: displays the version number</li>
 </ul>
 
-<p>Additionally, one of the following subcommands can be used: add, delete, enable, disable, search, clear.</p>
+<p>Additionally, one of the following subcommands can be used: add, delete, enable, disable, search, clear, trigger.</p>
 
 <p><strong><em>Subcommand add</em></strong></p>
 
@@ -107,12 +108,21 @@
 
 <p><strong><em>Subcommand clear</em></strong></p>
 
-<p>It will only clear SuperCron jobs from user's crontab:</p>
-
 <ul>
 <li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
 <li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
 <li>option <code>-f</code> or <code>--force</code>: skips asking for confirmation before clearing all jobs</li>
+</ul>
+
+<p>Note: this subcommand will only clear SuperCron jobs from user's crontab.</p>
+
+<p><strong><em>Subcommand trigger</em></strong></p>
+
+<ul>
+<li>option <code>-h</code> or <code>--help</code>: shows the help message of the subcommand</li>
+<li>option <code>-q</code> or <code>--quiet</code>: optional; suppresses all output and error messages</li>
+<li>option <code>-t</code> or <code>--trigger</code>: trigger in the form of "none" or "<em>ACTION</em> if <em>NAME</em> is <em>STATE</em>". See <strong>Triggers</strong> section below.</li>
+<li>argument <code>name</code>: required; represents the triggered job name on which <em>ACTION</em> will occur (several jobs can share the same name)</li>
 </ul>
 
 <h2>
@@ -170,6 +180,20 @@ supercron search @all
 <pre><code>supercron clear
 </code></pre>
 
+<ul>
+<li>Add a trigger:</li>
+</ul>
+
+<pre><code>supercon trigger -t "on if log_months is off" log_days
+</code></pre>
+
+<ul>
+<li>Remove a trigger:</li>
+</ul>
+
+<pre><code>supercron trigger -t none log_days
+</code></pre>
+
 <h2>
 <a id="repetition-sentences" class="anchor" href="#repetition-sentences" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repetition sentences</h2>
 
@@ -211,6 +235,28 @@ supercron search @all
 <li>every 30 minutes on fri and sat</li>
 <li>midnight from monday to friday in october and december</li>
 </ul>
+
+<h2>
+<a id="triggers" class="anchor" href="#triggers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Triggers</h2>
+
+<p>Triggers can take one of 2 forms:</p>
+
+<ul>
+<li>"none" for removing the previous trigger</li>
+<li>"<em>ACTION</em> if <em>NAME</em> is <em>STATE</em>" for adding a new trigger or replacing an old one</li>
+</ul>
+
+<p><em>ACTION</em> is the action applied on the enabled state of the triggered job and it can be <code>on</code>, <code>off</code> or <code>toggled</code>.</p>
+
+<p><em>NAME</em> is the name of the triggering job.</p>
+
+<p><em>STATE</em> is the triggering state of the triggering job, and it can be <code>enabled</code>, <code>disabled</code>, <code>toggled</code>, <code>added</code> or <code>deleted</code>.</p>
+
+<p>Using action <code>toggle</code> means to enable the triggered job if it was disabled, and to disable it if it was enabled.</p>
+
+<p>State <code>toggled</code> activates the trigger when the triggering job is enabled or disabled.</p>
+
+<p>Note that when a job is renamed from <em>name1</em> to <em>name2</em>, it means activating triggers that end with <code>if name1 is deleted</code> and triggers that end with <code>if name2 is added</code>, since a rename is considered a deletion of the old job name and an addition of the new job name.</p>
       </section>
     </div>
 
