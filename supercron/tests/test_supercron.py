@@ -390,6 +390,19 @@ class TestTriggers(unittest.TestCase):
 		user_crontab = Utils.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_trigger_addition_removal(self):
+		entry1 = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1"
+		entry2 = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%off:TEST__echo2:deleted"
+		args2 = Namespace({"name": "TEST__echo1", "trigger": ["off if TEST__echo2 is deleted"]})
+		SuperCron.trigger_job(args2)
+		user_crontab = Utils.get_crontab()
+		test1 = entry2 in user_crontab
+		args2 = Namespace({"name": "TEST__echo1", "trigger": ["none"]})
+		SuperCron.trigger_job(args2)
+		user_crontab = Utils.get_crontab()
+		test2 = entry1 in user_crontab and not entry2 in user_crontab
+		self.assertTrue(test1 and test2)
+
 
 if __name__ == "__main__":
 	unittest.main()
