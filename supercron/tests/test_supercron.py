@@ -90,6 +90,14 @@ class TestRepetitions(unittest.TestCase):
 		user_crontab = Utils.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
+	def test_day_full_month(self):
+		hour, minute = Utils.get_time_now()
+		entry = "{} {} 14 3 * ls # SuperCron__TEST__ls".format(minute, hour).encode()
+		args = Namespace(Utils.list_to_dict("TEST__ls", "ls", "14 march"))
+		SuperCron.add_job(args)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
 	def test_mixed_datetime(self):
 		entry = b"8 0 1 6 * ls # SuperCron__TEST__ls"
 		args = Namespace(Utils.list_to_dict("TEST__ls", "ls", "1/6 12:08 am"))

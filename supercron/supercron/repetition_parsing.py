@@ -165,6 +165,27 @@ class Repetition:
 					i = (i % 12) + 1
 				consec_months.append(str(matched_months[1]))
 				repeat['month_on'] = consec_months
+		# check for repetition clauses like: "on 22 september"
+		matched = re.search(r"(on\s*)?\b(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)",
+			repetition)
+		if matched:
+			day = int(matched.group(2))
+			month = int(Utils.MONTHS[matched.group(3)])
+			if month == 2 and not (1 <= day <= 29):
+				Utils.debug_print("Error: invalid value for day (expected value: 1-29).")
+				sys.exit(1)
+			elif month in (4, 6, 9, 11) and not (1 <= day <= 30):
+				Utils.debug_print("Error: invalid value for day (expected value: 1-30).")
+				sys.exit(1)
+			elif month in (1, 3, 5, 7, 8, 10, 12) and not (1 <= day <= 31):
+				Utils.debug_print("Error: invalid value for day (expected value: 1-31).")
+				sys.exit(1)
+			elif not (1 <= month <= 12):
+				Utils.debug_print("Error: invalid value for month (expected value: january..december).")
+				sys.exit(1)
+			else:
+				repeat['month_on'] = [month]
+				repeat['day_on'] = day
 		# check if minute and hour fields are empty
 		if repeat:
 			hour, minute = Utils.get_time_now()
