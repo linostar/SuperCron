@@ -301,7 +301,8 @@ class TestTriggers(unittest.TestCase):
 		SuperCron.delete_job(args)
 
 	def test_trigger_on_if_enabled(self):
-		entry = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:enabled"
+		entry1 = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:enabled"
+		entry2 = b"# 11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:enabled"
 		args1 = Namespace({"name": "TEST__echo1"})
 		SuperCron.disable_job(args1)
 		args1 = Namespace({"name": "TEST__echo2"})
@@ -310,10 +311,11 @@ class TestTriggers(unittest.TestCase):
 		SuperCron.trigger_job(args2)
 		SuperCron.enable_job(args1)
 		user_crontab = Utils.get_crontab()
-		self.assertTrue(entry in user_crontab)
+		self.assertTrue(entry1 in user_crontab and not entry2 in user_crontab)
 
 	def test_trigger_on_if_disabled(self):
-		entry = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:disabled"
+		entry1 = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:disabled"
+		entry2 = b"# 11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:disabled"
 		args1 = Namespace({"name": "TEST__echo1"})
 		SuperCron.disable_job(args1)
 		args2 = Namespace({"name": "TEST__echo1", "trigger": ["on if TEST__echo2 is disabled"]})
@@ -321,7 +323,33 @@ class TestTriggers(unittest.TestCase):
 		args1 = Namespace({"name": "TEST__echo2"})
 		SuperCron.disable_job(args1)
 		user_crontab = Utils.get_crontab()
-		self.assertTrue(entry in user_crontab)
+		self.assertTrue(entry1 in user_crontab and not entry2 in user_crontab)
+
+	def test_trigger_on_if_added(self):
+		entry1 = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:added"
+		entry2 = b"# 11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:added"
+		args1 = Namespace({"name": "TEST__echo1"})
+		SuperCron.disable_job(args1)
+		args1 = Namespace({"name": "TEST__echo2"})
+		SuperCron.delete_job(args1)
+		args2 = Namespace({"name": "TEST__echo1", "trigger": ["on if TEST__echo2 is added"]})
+		SuperCron.trigger_job(args2)
+		args1 = Namespace(Utils.list_to_dict("TEST__echo2", "echo 2 > /dev/null", "12:12"))
+		SuperCron.add_job(args1)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry1 in user_crontab and not entry2 in user_crontab)
+
+	def test_trigger_on_if_deleted(self):
+		entry1 = b"11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:deleted"
+		entry2 = b"# 11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%on:TEST__echo2:deleted"
+		args1 = Namespace({"name": "TEST__echo1"})
+		SuperCron.disable_job(args1)
+		args2 = Namespace({"name": "TEST__echo1", "trigger": ["on if TEST__echo2 is deleted"]})
+		SuperCron.trigger_job(args2)
+		args1 = Namespace({"name": "TEST__echo2"})
+		SuperCron.delete_job(args1)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry1 in user_crontab and not entry2 in user_crontab)
 
 	def test_trigger_off_if_enabled(self):
 		entry = b"# 11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%off:TEST__echo2:enabled"
@@ -339,6 +367,26 @@ class TestTriggers(unittest.TestCase):
 		SuperCron.trigger_job(args2)
 		args1 = Namespace({"name": "TEST__echo2"})
 		SuperCron.disable_job(args1)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_trigger_off_if_added(self):
+		entry = b"# 11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%off:TEST__echo2:added"
+		args1 = Namespace({"name": "TEST__echo2"})
+		SuperCron.delete_job(args1)
+		args2 = Namespace({"name": "TEST__echo1", "trigger": ["off if TEST__echo2 is added"]})
+		SuperCron.trigger_job(args2)
+		args1 = Namespace(Utils.list_to_dict("TEST__echo2", "echo 2 > /dev/null", "12:12"))
+		SuperCron.add_job(args1)
+		user_crontab = Utils.get_crontab()
+		self.assertTrue(entry in user_crontab)
+
+	def test_trigger_off_if_deleted(self):
+		entry = b"# 11 11 * * * echo 1 > /dev/null # SuperCron__TEST__echo1%off:TEST__echo2:deleted"
+		args2 = Namespace({"name": "TEST__echo1", "trigger": ["off if TEST__echo2 is deleted"]})
+		SuperCron.trigger_job(args2)
+		args1 = Namespace({"name": "TEST__echo2"})
+		SuperCron.delete_job(args1)
 		user_crontab = Utils.get_crontab()
 		self.assertTrue(entry in user_crontab)
 
