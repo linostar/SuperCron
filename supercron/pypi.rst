@@ -204,7 +204,9 @@ Examples of accepted repetition sentences (case insensitive):
 
 - at 10:10 pm 
 
-- on 19/5 
+- on 19/5
+
+- on 14 May
 
 - in september
 
