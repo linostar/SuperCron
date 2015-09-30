@@ -104,6 +104,27 @@ Note: this subcommand will only clear SuperCron jobs from user's crontab.
 
 - argument ``name``: required; represents the triggered job name on which *ACTION* will occur (several jobs can share the same name)
 
+Triggers
+--------
+
+Triggers can take one of 2 forms:
+
+- "none" for removing the previous trigger
+
+- "*ACTION* if *NAME* is *STATE*" for adding a new trigger or replacing an old one
+
+*ACTION* is the action applied on the enabled state of the triggered job and it can be ``on``, ``off`` or ``toggle``.
+
+*NAME* is the name of the triggering job.
+
+*STATE* is the triggering state of the triggering job, and it can be ``enabled``, ``disabled``, ``toggled``, ``added`` or ``deleted``.
+
+Using action ``toggle`` means to enable the triggered job if it was disabled, and to disable it if it was enabled.
+
+State ``toggled`` activates the trigger when the triggering job is enabled or disabled.
+
+Note that when a job is renamed from *name1* to *name2*, it means activating triggers that end with ``if name1 is deleted`` and triggers that end with ``if name2 is added``, since a rename is considered a deletion of the old job name and an addition of the new job name.
+
 Examples
 --------
 
@@ -230,27 +251,6 @@ above. For example:
 - every 30 minutes on fri and sat 
 
 - midnight from monday to friday in october and december
-
-Triggers
---------
-
-Triggers can take one of 2 forms:
-
-- "none" for removing the previous trigger
-
-- "*ACTION* if *NAME* is *STATE*" for adding a new trigger or replacing an old one
-
-*ACTION* is the action applied on the enabled state of the triggered job and it can be ``on``, ``off`` or ``toggled``.
-
-*NAME* is the name of the triggering job.
-
-*STATE* is the triggering state of the triggering job, and it can be ``enabled``, ``disabled``, ``toggled``, ``added`` or ``deleted``.
-
-Using action ``toggle`` means to enable the triggered job if it was disabled, and to disable it if it was enabled.
-
-State ``toggled`` activates the trigger when the triggering job is enabled or disabled.
-
-Note that when a job is renamed from *name1* to *name2*, it means activating triggers that end with ``if name1 is deleted`` and triggers that end with ``if name2 is added``, since a rename is considered a deletion of the old job name and an addition of the new job name.
 
 Homepage and Repository
 -----------------------
