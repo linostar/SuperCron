@@ -36,7 +36,7 @@
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Run <code>pip install supercron</code> or <code>easy_install supercron</code>.</p>
+<p>Run <code>pip install supercron</code>.</p>
 
 <h2>
 <a id="supercron-vs-classical-crontab" class="anchor" href="#supercron-vs-classical-crontab" aria-hidden="true"><span class="octicon octicon-link"></span></a>SuperCron vs classical crontab</h2>
@@ -124,6 +124,28 @@
 <li>option <code>-t</code> or <code>--trigger</code>: trigger in the form of "none" or "<em>ACTION</em> if <em>NAME</em> is <em>STATE</em>". See <strong>Triggers</strong> section below.</li>
 <li>argument <code>name</code>: required; represents the triggered job name on which <em>ACTION</em> will occur (several jobs can share the same name)</li>
 </ul>
+
+<h2>
+<a id="triggers" class="anchor" href="#triggers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Triggers</h2>
+
+<p>Triggers can take one of 2 forms:</p>
+
+<ul>
+<li>"none" for removing the previous trigger</li>
+<li>"<em>ACTION</em> if <em>NAME</em> is <em>STATE</em>" for adding a new trigger or replacing an old one</li>
+</ul>
+
+<p><em>ACTION</em> is the action applied on the enabled state of the triggered job and it can be <code>on</code>, <code>off</code> or <code>toggle</code>.</p>
+
+<p><em>NAME</em> is the name of the triggering job.</p>
+
+<p><em>STATE</em> is the triggering state of the triggering job, and it can be <code>enabled</code>, <code>disabled</code>, <code>toggled</code>, <code>added</code> or <code>deleted</code>.</p>
+
+<p>Using action <code>toggle</code> means to enable the triggered job if it was disabled, and to disable it if it was enabled.</p>
+
+<p>State <code>toggled</code> activates the trigger when the triggering job is enabled or disabled.</p>
+
+<p>Note that when a job is renamed from <em>name1</em> to <em>name2</em>, it means activating triggers that end with <code>if name1 is deleted</code> and triggers that end with <code>if name2 is added</code>, since a rename is considered a deletion of the old job name and an addition of the new job name.</p>
 
 <h2>
 <a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
@@ -219,6 +241,7 @@ supercron search @all
 <li>at 10:10 am</li>
 <li>at 10:10 pm</li>
 <li>on 19/5</li>
+<li>on 14 May</li>
 <li>in september</li>
 <li>in sep</li>
 <li>from may to august</li>
@@ -235,28 +258,6 @@ supercron search @all
 <li>every 30 minutes on fri and sat</li>
 <li>midnight from monday to friday in october and december</li>
 </ul>
-
-<h2>
-<a id="triggers" class="anchor" href="#triggers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Triggers</h2>
-
-<p>Triggers can take one of 2 forms:</p>
-
-<ul>
-<li>"none" for removing the previous trigger</li>
-<li>"<em>ACTION</em> if <em>NAME</em> is <em>STATE</em>" for adding a new trigger or replacing an old one</li>
-</ul>
-
-<p><em>ACTION</em> is the action applied on the enabled state of the triggered job and it can be <code>on</code>, <code>off</code> or <code>toggled</code>.</p>
-
-<p><em>NAME</em> is the name of the triggering job.</p>
-
-<p><em>STATE</em> is the triggering state of the triggering job, and it can be <code>enabled</code>, <code>disabled</code>, <code>toggled</code>, <code>added</code> or <code>deleted</code>.</p>
-
-<p>Using action <code>toggle</code> means to enable the triggered job if it was disabled, and to disable it if it was enabled.</p>
-
-<p>State <code>toggled</code> activates the trigger when the triggering job is enabled or disabled.</p>
-
-<p>Note that when a job is renamed from <em>name1</em> to <em>name2</em>, it means activating triggers that end with <code>if name1 is deleted</code> and triggers that end with <code>if name2 is added</code>, since a rename is considered a deletion of the old job name and an addition of the new job name.</p>
       </section>
     </div>
 
