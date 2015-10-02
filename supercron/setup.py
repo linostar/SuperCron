@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_version = '0.3.1'
+package_version = '0.3.2'
 fp = open('pypi.rst', 'r')
 pypi_readme = fp.read()
 fp.close()
@@ -8,14 +8,12 @@ fp.close()
 setup(
 	name = 'supercron',
 	packages = ['supercron', 'tests'],
-	package_data = {'': ['pypi.rst']},
-	include_package_data = True,
 	version = package_version,
 	description ='Intelligent interface to cron in UNIX systems',
 	author = 'Anas El Husseini',
 	author_email = 'linux.anas@gmail.com',
 	license = 'BSD',
-	url = 'https://github.com/linostar/SuperCron',
+	url = 'https://linostar.github.io/SuperCron',
 	download_url = 'https://github.com/linostar/SuperCron/tarball/' + package_version,
 	keywords = ['cron', 'crontab', 'scheduling'],
 	install_requires = ['python-crontab>=1.9.3'],
