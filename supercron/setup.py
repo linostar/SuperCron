@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_version = '0.3.0'
+package_version = '0.3.1'
 fp = open('pypi.rst', 'r')
 pypi_readme = fp.read()
 fp.close()
@@ -8,6 +8,8 @@ fp.close()
 setup(
 	name = 'supercron',
 	packages = ['supercron', 'tests'],
+	package_data = {'': ['pypi.rst']},
+	include_package_data = True,
 	version = package_version,
 	description ='Intelligent interface to cron in UNIX systems',
 	author = 'Anas El Husseini',
@@ -21,6 +23,7 @@ setup(
 	entry_points = {
 	'console_scripts': [
 	'supercron = supercron.supercron:main',
+	'supercron_test = tests.test_supercron:main',
 	],
 	},
 	classifiers = [

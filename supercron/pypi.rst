@@ -4,7 +4,7 @@ SuperCron
 Installation
 ------------
 
-Run ``pip install supercron`` or ``easy_install supercron``.
+Run ``pip install supercron``.
 
 SuperCron vs classical crontab
 ------------------------------

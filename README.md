@@ -5,7 +5,7 @@ Intelligent interface to cron in UNIX systems.
 
 ## Installation
 
-Run `pip install supercron` or `easy_install supercron`.
+Run `pip install supercron`.
 
 ## SuperCron vs classical crontab
 SuperCron is based on crontab, while providing the following additional advantages:

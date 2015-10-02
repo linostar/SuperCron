@@ -412,5 +412,8 @@ class TestTriggers(unittest.TestCase):
 		self.assertTrue(test1 and test2)
 
 
-if __name__ == "__main__":
+def main():
 	unittest.main()
+
+if __name__ == "__main__":
+	main()
