@@ -18,7 +18,7 @@ except ImportError:
 class SuperCron:
 	"""Main SuperCron class"""
 
-	VERSION = "0.3.2"
+	VERSION = "0.4.0"
 	TOBEDELETED = "@tobedeleted"
 
 	@staticmethod
@@ -407,10 +407,22 @@ class SuperCron:
 		except KeyboardInterrupt:
 			Utils.debug_print("\nCancelled.")
 
+	@staticmethod
+	def input_mode(input_file):
+		with open(input_file, "r") as infile:
+			for line in infile:
+				if (line):
+					splitted = line.split(" ")
+					if len(splitted) > 1:
+						cmd = splitted[0]
+						args = " ".join(splitted[1:])
+
 
 def main():
 	if len(sys.argv) == 1:
 		SuperCron.interactive_mode()
+	elif len(sys.argv) == 3 and sys.argv[1] == "--input":
+		SuperCron.input_mode(sys.argv[2])
 	else:
 		SuperCron.parse_arguments()
 	sys.exit(0)

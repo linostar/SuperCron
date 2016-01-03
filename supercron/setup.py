@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_version = '0.3.2'
+package_version = '0.4.0'
 fp = open('pypi.rst', 'r')
 pypi_readme = fp.read()
 fp.close()
@@ -21,7 +21,6 @@ setup(
 	entry_points = {
 	'console_scripts': [
 	'supercron = supercron.supercron:main',
-	'supercron_test = tests.test_supercron:main',
 	],
 	},
 	classifiers = [
